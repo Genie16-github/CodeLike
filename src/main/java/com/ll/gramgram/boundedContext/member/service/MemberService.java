@@ -1,5 +1,7 @@
 package com.ll.gramgram.boundedContext.member.service;
 
+import com.ll.gramgram.DataNotFoundException;
+import com.ll.gramgram.base.rq.Rq;
 import com.ll.gramgram.base.rsData.RsData;
 import com.ll.gramgram.boundedContext.instaMember.entity.InstaMember;
 import com.ll.gramgram.boundedContext.member.entity.Member;
@@ -17,8 +19,8 @@ import java.util.Optional;
 @Transactional(readOnly = true) // 아래 메서드들이 전부 readonly 라는 것을 명시, 나중을 위해
 public class MemberService {
     private final PasswordEncoder passwordEncoder;
-
     private final MemberRepository memberRepository;
+    private final Rq rq;
 
     public Optional<Member> findByUsername(String username) {
         return memberRepository.findByUsername(username);
@@ -69,5 +71,15 @@ public class MemberService {
 
         // 소셜 로그인를 통한 가입시 비번은 없다.
         return join(providerTypeCode, username, ""); // 최초 로그인 시 딱 한번 실행
+    }
+
+    public Member findByInstaMemberId(Long userId) {
+        Optional<Member> member = memberRepository.findByInstaMemberId(userId.intValue());
+        if (member.isPresent()){
+            return member.get();
+        }
+        else{
+            throw new DataNotFoundException("member not found");
+        }
     }
 }
