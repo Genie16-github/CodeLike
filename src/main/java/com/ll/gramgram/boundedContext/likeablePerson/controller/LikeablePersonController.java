@@ -73,10 +73,9 @@ public class LikeablePersonController {
     public String delete(@PathVariable("id") Long id){
         LikeablePerson likeablePerson = likeablePersonService.getLikeablePerson(id);
         Long insta_id = likeablePerson.getFromInstaMember().getId(); // 호감표현을 한 InstaMember 객체의 id값을 가져옴
-        Member member = memberService.findByInstaMemberId(insta_id); // InstaMemberId 값으로 member 객체의 id값을 찾음
 
-        // member 객체의 사용자 ID와 지금 현재 로그인한 멤버의 ID 값이 일치하지 않으면 권한 없음 출력
-        if (!member.getUsername().equals(rq.getMember().getUsername())){
+        // 호감 표현을 한 insta_id와 지금 현재 로그인한 멤버의 인스타 id 값이 일치하지 않으면 권한 없음 출력
+        if (!insta_id.equals(rq.getMember().getInstaMember().getId())){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "삭제권한이 없습니다.");
         }
 

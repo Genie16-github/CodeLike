@@ -25,7 +25,7 @@
 
 
 **[접근 방법]**
-- 호감 목록의 소유권을 확인하기 위해 instaMember 테이블을 거쳐 Member 테이블로 접근
+- 호감 목록의 소유권을 확인하기 위해 instaMember 테이블의 아이디 값과 likeablePerson 테이블의 FromInstaMemberId 값을 비교
 - oauth2Login으로 구분되고 CustomOAuth2UserService 클래스에 loadUser 메서드에서 providerTypeCode를 구분해서 없으면 가입을 시키고 있으면 
 바로 리턴을 해주기 때문에 해당 메서드로 접근할 수 있게 application.yml 파일만 수정을 해주면 되겠다.
 - 여러 티스토리 블로그 참고
