@@ -8,8 +8,8 @@
 - [x] 목록에 데이터 X
 
 #### 구글 로그인 처리
-- [ ] provider_type_code 가 GOOGLE 로 해서 DB 저장
-- [ ] 로그인 후 회원의 username 을 상단에서 확인 가능
+- [x] provider_type_code 가 GOOGLE 로 해서 DB 저장
+- [x] 로그인 후 회원의 username 을 상단에서 확인 가능
 
 
 ### 1주차 미션 요약
@@ -25,9 +25,18 @@
 
 
 **[접근 방법]**
-
+- 호감 목록의 소유권을 확인하기 위해 instaMember 테이블을 거쳐 Member 테이블로 접근
+- oauth2Login으로 구분되고 CustomOAuth2UserService 클래스에 loadUser 메서드에서 providerTypeCode를 구분해서 없으면 가입을 시키고 있으면 
+바로 리턴을 해주기 때문에 해당 메서드로 접근할 수 있게 application.yml 파일만 수정을 해주면 되겠다.
+- 여러 티스토리 블로그 참고
 
 
 
 **[특이사항]**
-
+- 호감 상대를 삭제할 때 delete 쿼리가 무시되어 삭제X
+ <br/>&rarr; LikeablePersonService 클래스에 `@Transactional(readOnly = true)`
+때문
+ <br/>&rarr; LikeablePersonService 클래스 안 delete 메서드에 `@Transactional` 추가
+- 구글 계정 정보가 전달(권한)X
+ <br/>&rarr; scope에 얻고자하는 정보의 문자열을 입력을 해줘야 발급된 
+액세스 토큰에 부여된 스코프에 해당하는 권한을 제한적으로 얻을 수 있다.
