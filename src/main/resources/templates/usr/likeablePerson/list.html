@@ -17,11 +17,13 @@
 
     <th:block th:if="${@rq.member.hasConnectedInstaMember}">
         <ul>
-            <li th:each="likeablePerson: ${likeablePeople}">
-                <span class="toInstaMember_username" th:text="${likeablePerson.toInstaMember.username}"></span>
-                <span class="toInstaMember_attractiveTypeDisplayName"
-                      th:text="${likeablePerson.attractiveTypeDisplayName}"></span>
-                <a th:href="@{|delete/${likeablePerson.id}|}" onclick="return confirm('정말로 삭제하시겠습니까?');">삭제</a>
+            <li th:each="likeablePerson: ${likeablePeople}" style="display: inline">
+                <div class="likeablePersonList">
+                    <span class="toInstaMember_username" onclick="location.href='#'" th:text="${likeablePerson.toInstaMember.username}"></span>
+                    <span class="toInstaMember_attractiveTypeDisplayName"
+                          th:text="|매력 포인트 : ${likeablePerson.attractiveTypeDisplayName}|"></span>
+                    <a class="a_delete" th:href="@{|delete/${likeablePerson.id}|}" onclick="return confirm('정말로 삭제하시겠습니까?');">삭제</a>
+                </div>
             </li>
         </ul>
     </th:block>

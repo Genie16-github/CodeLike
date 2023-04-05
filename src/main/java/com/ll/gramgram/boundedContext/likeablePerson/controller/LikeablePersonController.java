@@ -81,6 +81,6 @@ public class LikeablePersonController {
         }
 
         likeablePersonService.delete(likeablePerson);
-        return rq.redirectWithMsg("/likeablePerson/list", "호감상대 삭제");
+        return rq.redirectWithMsg("/likeablePerson/list", "삭제가 완료되었습니다.");
     }
 }
