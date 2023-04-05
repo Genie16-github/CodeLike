@@ -53,7 +53,7 @@ public class LikeablePersonService {
     }
 
     public LikeablePerson getLikeablePerson(Long id) {
-        Optional<LikeablePerson> likeablePerson = likeablePersonRepository.findById(id.intValue());
+        Optional<LikeablePerson> likeablePerson = likeablePersonRepository.findById(id);
         if (likeablePerson.isPresent()){
             return likeablePerson.get();
         }

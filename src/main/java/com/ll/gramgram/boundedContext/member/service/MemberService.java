@@ -74,7 +74,7 @@ public class MemberService {
     }
 
     public Member findByInstaMemberId(Long userId) {
-        Optional<Member> member = memberRepository.findByInstaMemberId(userId.intValue());
+        Optional<Member> member = memberRepository.findByInstaMemberId(userId);
         if (member.isPresent()){
             return member.get();
         }

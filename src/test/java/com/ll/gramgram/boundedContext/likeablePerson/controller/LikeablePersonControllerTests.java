@@ -147,16 +147,16 @@ public class LikeablePersonControllerTests {
                 .andExpect(handler().methodName("showList"))
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(content().string(containsString("""
-                        <span class="toInstaMember_username">insta_user4</span>
+                        <span class="toInstaMember_username" onclick="location.href='#'">insta_user4</span>
                         """.stripIndent().trim())))
                 .andExpect(content().string(containsString("""
-                        <span class="toInstaMember_attractiveTypeDisplayName">외모</span>
+                        <span class="toInstaMember_attractiveTypeDisplayName">매력 포인트 : 외모</span>
                         """.stripIndent().trim())))
                 .andExpect(content().string(containsString("""
-                        <span class="toInstaMember_username">insta_user100</span>
+                        <span class="toInstaMember_username" onclick="location.href='#'">insta_user100</span>
                         """.stripIndent().trim())))
                 .andExpect(content().string(containsString("""
-                        <span class="toInstaMember_attractiveTypeDisplayName">성격</span>
+                        <span class="toInstaMember_attractiveTypeDisplayName">매력 포인트 : 성격</span>
                         """.stripIndent().trim())));
         ;
     }
@@ -166,7 +166,7 @@ public class LikeablePersonControllerTests {
     void t006() {
         // 초기 데이터 2개(insta_user3 -> insta_user4, insta_user3 -> insta_user100)
         assertEquals(2, likeablePersonRepository.count());
-        Optional<LikeablePerson> likeablePerson = likeablePersonRepository.findById(1);
+        Optional<LikeablePerson> likeablePerson = likeablePersonRepository.findById(1L);
         assertTrue(likeablePerson.isPresent()); // 1번 데이터가 존재하는지 확인
         LikeablePerson lp = likeablePerson.get();
         likeablePersonService.delete(lp);
