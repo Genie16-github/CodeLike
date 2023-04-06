@@ -20,6 +20,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Objects;
 
 @Controller
 @RequestMapping("/likeablePerson")
@@ -67,16 +68,21 @@ public class LikeablePersonController {
 
     @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/delete/{id}")
-    public String delete(@PathVariable("id") Long id){
-        LikeablePerson likeablePerson = likeablePersonService.getLikeablePerson(id);
-        Long insta_id = likeablePerson.getFromInstaMember().getId(); // 호감표현을 한 InstaMember 객체의 id값을 가져옴
+    public String delete(@PathVariable Long id) {
+        LikeablePerson likeablePerson = likeablePersonService.findById(id).orElse(null); // 이상한 ID 값이 들어올 수도 있다. -> null로 처리
 
-        // 호감 표현을 한 insta_id와 지금 현재 로그인한 멤버의 인스타 id 값이 일치하지 않으면 권한 없음 출력
-        if (!insta_id.equals(rq.getMember().getInstaMember().getId())){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "삭제권한이 없습니다.");
-        }
+        // 삭제를 시도하는 유저가 권한이 있는지 확인. 소유권 확인
+        RsData<LikeablePerson> canActorDeleteRsData = likeablePersonService.canActorDelete(rq.getMember(), likeablePerson);
 
-        likeablePersonService.delete(likeablePerson);
-        return rq.redirectWithMsg("/likeablePerson/list", "삭제가 완료되었습니다.");
+        // 'F-' 로 시작하는 메시지를 전달 받았을 경우
+        if (canActorDeleteRsData.isFail()) return rq.historyBack(canActorDeleteRsData);
+
+        // likeablePerson 객체가 null 이 아닐 경우 삭제
+        RsData<LikeablePerson> deleteRs = likeablePersonService.delete(Objects.requireNonNull(likeablePerson));
+
+        // 'S-' 로 시작하는 메시지를 전달 받지 못했을 경우
+        if (deleteRs.isFail()) return rq.historyBack(deleteRs);
+
+        return rq.redirectWithMsg("/likeablePerson/list", deleteRs); // deleteRs : "S-1", "xxx 님에 대한 호감을 취소하였습니다."
     }
 }
