@@ -66,4 +66,8 @@ public class LikeablePersonService {
     public void delete(LikeablePerson likeablePerson) {
         likeablePersonRepository.delete(likeablePerson);
     }
+
+    public Optional<LikeablePerson> findById(Long id) {
+        return likeablePersonRepository.findById(id);
+    }
 }

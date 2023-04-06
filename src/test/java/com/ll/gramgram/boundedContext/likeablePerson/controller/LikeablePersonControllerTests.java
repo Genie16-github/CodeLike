@@ -1,7 +1,6 @@
 package com.ll.gramgram.boundedContext.likeablePerson.controller;
 
 
-import com.ll.gramgram.boundedContext.likeablePerson.entity.LikeablePerson;
 import com.ll.gramgram.boundedContext.likeablePerson.repository.LikeablePersonRepository;
 import com.ll.gramgram.boundedContext.likeablePerson.service.LikeablePersonService;
 import org.junit.jupiter.api.DisplayName;
@@ -15,14 +14,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -162,15 +157,67 @@ public class LikeablePersonControllerTests {
     }
 
     @Test
-    @DisplayName("삭제 기능 테스트")
-    void t006() {
-        // 초기 데이터 2개(insta_user3 -> insta_user4, insta_user3 -> insta_user100)
-        assertEquals(2, likeablePersonRepository.count());
-        Optional<LikeablePerson> likeablePerson = likeablePersonRepository.findById(1L);
-        assertTrue(likeablePerson.isPresent()); // 1번 데이터가 존재하는지 확인
-        LikeablePerson lp = likeablePerson.get();
-        likeablePersonService.delete(lp);
-        // 데이터가 삭제되었는지 확인
-        assertEquals(1, likeablePersonRepository.count());
+    @DisplayName("호감삭제")
+    @WithUserDetails("user3")
+    void t006() throws Exception {
+        // WHEN
+        ResultActions resultActions = mvc
+                .perform(
+                        delete("/likeablePerson/1")
+                                .with(csrf())
+                )
+                .andDo(print());
+
+        // THEN
+        resultActions
+                .andExpect(handler().handlerType(LikeablePersonController.class))
+                .andExpect(handler().methodName("delete"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrlPattern("/likeablePerson/list**"))
+        ;
+
+        assertThat(likeablePersonService.findById(1L).isPresent()).isEqualTo(false);
+    }
+
+    @Test
+    @DisplayName("호감삭제(없는거 삭제, 삭제가 안되어야 함)")
+    @WithUserDetails("user3")
+    void t007() throws Exception {
+        // WHEN
+        ResultActions resultActions = mvc
+                .perform(
+                        delete("/likeablePerson/100")
+                                .with(csrf())
+                )
+                .andDo(print());
+
+        // THEN
+        resultActions
+                .andExpect(handler().handlerType(LikeablePersonController.class))
+                .andExpect(handler().methodName("delete"))
+                .andExpect(status().is4xxClientError())
+        ;
+    }
+
+    @Test
+    @DisplayName("호감삭제(권한이 없는 경우, 삭제가 안됨)")
+    @WithUserDetails("user2")
+    void t008() throws Exception {
+        // WHEN
+        ResultActions resultActions = mvc
+                .perform(
+                        delete("/likeablePerson/1")
+                                .with(csrf())
+                )
+                .andDo(print());
+
+        // THEN
+        resultActions
+                .andExpect(handler().handlerType(LikeablePersonController.class))
+                .andExpect(handler().methodName("delete"))
+                .andExpect(status().is4xxClientError())
+        ;
+
+        assertThat(likeablePersonService.findById(1L).isPresent()).isEqualTo(true);
     }
 }
