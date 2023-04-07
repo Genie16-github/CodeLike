@@ -9,5 +9,4 @@ import java.util.Optional;
 // JpaRepository<Member, Long> => Member == member 테이블, Long == member 의 주키의 타입
 public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findByUsername(String username);
-    Optional<Member> findByInstaMemberId(Long userId);
 }

@@ -1,6 +1,5 @@
 package com.ll.gramgram.boundedContext.member.service;
 
-import com.ll.gramgram.DataNotFoundException;
 import com.ll.gramgram.base.rq.Rq;
 import com.ll.gramgram.base.rsData.RsData;
 import com.ll.gramgram.boundedContext.instaMember.entity.InstaMember;
@@ -73,13 +72,4 @@ public class MemberService {
         return join(providerTypeCode, username, ""); // 최초 로그인 시 딱 한번 실행
     }
 
-    public Member findByInstaMemberId(Long userId) {
-        Optional<Member> member = memberRepository.findByInstaMemberId(userId);
-        if (member.isPresent()){
-            return member.get();
-        }
-        else{
-            throw new DataNotFoundException("member not found");
-        }
-    }
 }

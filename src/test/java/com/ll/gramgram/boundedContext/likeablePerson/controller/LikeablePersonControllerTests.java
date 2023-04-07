@@ -29,8 +29,6 @@ public class LikeablePersonControllerTests {
     @Autowired
     private MockMvc mvc;
     @Autowired
-    private LikeablePersonRepository likeablePersonRepository;
-    @Autowired
     private LikeablePersonService likeablePersonService;
 
     @Test
