@@ -17,7 +17,7 @@
 
     <th:block th:if="${@rq.member.hasConnectedInstaMember}">
         <script th:inline="javascript">
-            const myInstaMember = /*[[ ${@rq.member.instaMember} ]]*/ null;
+            const myInstaMemberUsername = /*[[ ${@rq.member.instaMember.username} ]]*/ null;
 
             function AddForm__submit(form) {
                 // username 이(가) 올바른지 체크
@@ -36,7 +36,7 @@
                     return;
                 }
 
-                if (form.username.value === myInstaMember.username) {
+                if (form.username.value === myInstaMemberUsername) {
                     toastWarning('본인을 호감상대로 등록할 수 없습니다.');
                     form.username.focus();
                     return;
@@ -55,7 +55,7 @@
         </script>
 
         <form th:action method="POST" className="p-10 max-w-sm flex flex-col gap-4"
-              onsubmit="AddForm__submit(this); return false">
+              onsubmit="AddForm__submit(this); return false;">
             <div>
                 당신의 인스타ID : <span className="badge" th:text="${@rq.member.instaMember.username}"></span>
             </div>
