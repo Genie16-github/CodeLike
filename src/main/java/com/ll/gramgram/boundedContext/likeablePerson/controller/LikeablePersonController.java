@@ -56,7 +56,7 @@ public class LikeablePersonController {
 
         // 인스타인증을 했는지 체크
         if (instaMember != null) {
-            List<LikeablePerson> likeablePeople = likeablePersonService.findByFromInstaMemberId(instaMember.getId());
+            List<LikeablePerson> likeablePeople = instaMember.getFromLikeablePeople();
             model.addAttribute("likeablePeople", likeablePeople);
         }
 
@@ -76,11 +76,11 @@ public class LikeablePersonController {
         if (canActorDeleteRsData.isFail()) return rq.historyBack(canActorDeleteRsData);
 
         // likeablePerson 객체가 null 이 아닐 경우 삭제
-        RsData<LikeablePerson> deleteRs = likeablePersonService.delete(Objects.requireNonNull(likeablePerson));
+        RsData<LikeablePerson> deleteRsData = likeablePersonService.delete(Objects.requireNonNull(likeablePerson));
 
         // 'S-' 로 시작하는 메시지를 전달 받지 못했을 경우
-        if (deleteRs.isFail()) return rq.historyBack(deleteRs);
+        if (deleteRsData.isFail()) return rq.historyBack(deleteRsData);
 
-        return rq.redirectWithMsg("/likeablePerson/list", deleteRs); // deleteRs : "S-1", "xxx 님에 대한 호감을 취소하였습니다."
+        return rq.redirectWithMsg("/likeablePerson/list", deleteRsData); // deleteRsData : "S-1", "xxx 님에 대한 호감을 취소하였습니다."
     }
 }
