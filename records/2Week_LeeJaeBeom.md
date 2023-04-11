@@ -13,14 +13,14 @@
   - "F-3", "이미 등록된 사용자입니다."
 
 #### 케이스 5 : 11명 이상에게 호감 표시
-- [ ] 로그인 한 사용자의 인스타 아이디를 가지고 좋아요 정보 확인
-- [ ] 좋아요 정보의 리스트 크기를 확인
-- [ ] 리스트의 크기가 10 이상이면 예외처리
+- [x] 로그인 한 사용자의 인스타 아이디를 가지고 좋아요 정보 확인
+- [x] 좋아요 정보의 리스트 크기를 확인
+- [x] 리스트의 크기가 10 이상이면 예외처리
   - "F-4", "등록할 수 있는 호감 상대는 10명이 최대입니다."
 
 #### 케이스 6 : 매력 포인트만 다르게 입력 시 기존 값 수정
-- [ ] 입력된 데이터의 username, attractiveTypeCode와 기존 데이터의 ToInstaMemberUsername과 attractiveTypeCode 비교
-- [ ] username과 ToInstaMemberUsername이 같으면 입력된 attractiveTypeCode로 데이터 수정
+- [x] 입력된 데이터의 username, attractiveTypeCode와 기존 데이터의 ToInstaMemberUsername과 attractiveTypeCode 비교
+- [x] username과 ToInstaMemberUsername이 같으면 입력된 attractiveTypeCode로 데이터 수정
   - "S-2", "xxx의 매력 포인트가 변경되었습니다."
 
 #### 네이버 로그인 처리
@@ -68,6 +68,7 @@
  기존의 정보를 수정한다.
 - 저장을 하기 이전에 좋아요 정보의 크기가 10 이상일 경우
  추가가 되면 안된다.
+
 
 
 

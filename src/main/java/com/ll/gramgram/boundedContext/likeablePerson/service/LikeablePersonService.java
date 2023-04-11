@@ -67,6 +67,13 @@ public class LikeablePersonService {
     }
 
     @Transactional
+    public RsData<LikeablePerson> modify(LikeablePerson likeablePerson, String username, int attractiveTypeCode) {
+        likeablePerson.setAttractiveTypeCode(attractiveTypeCode);
+        likeablePersonRepository.save(likeablePerson);
+        return RsData.of("S-2", "%s 의 매력 포인트가 변경되었습니다.".formatted(username), likeablePerson);
+    }
+
+    @Transactional
     public RsData<LikeablePerson> delete(LikeablePerson likeablePerson) {
         likeablePersonRepository.delete(likeablePerson);
 
@@ -98,10 +105,11 @@ public class LikeablePersonService {
                 if (likeablePerson.getAttractiveTypeCode() == attractiveTypeCode){
                     return RsData.of("F-1", "이미 등록된 사용자입니다.");
                 }
-                return RsData.of("F-2", "수정이 필요합니다.");
+                return RsData.of("F-2", "수정이 필요합니다.", likeablePerson);
             }
         }
 
         return RsData.of("S-1", "추가 가능한 사용자입니다.");
     }
+
 }
