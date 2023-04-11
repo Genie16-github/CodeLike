@@ -33,6 +33,11 @@ public class LikeablePersonService {
         InstaMember fromInstaMember = member.getInstaMember();
         InstaMember toInstaMember = instaMemberService.findByUsernameOrCreate(username).getData();
 
+        // 호감 목록에 10개 이상의 데이터가 있는 경우 더이상 추가하면 안된다.
+        if (fromInstaMember.getFromLikeablePeople().size() >= 10){
+            return RsData.of("F-3", "등록할 수 있는 호감 상대는 10명이 최대입니다.");
+        }
+
         LikeablePerson likeablePerson = LikeablePerson
                 .builder()
                 .fromInstaMember(fromInstaMember) // 호감을 표시하는 사람의 인스타 멤버
@@ -50,7 +55,7 @@ public class LikeablePersonService {
         // 너를 좋아하는 호감표시 생겼어.
         toInstaMember.addToLikeablePerson(likeablePerson);
 
-        return RsData.of("S-1", "입력하신 인스타유저(%s)를 호감상대로 등록되었습니다.".formatted(username), likeablePerson);
+        return RsData.of("S-1", "입력하신 인스타유저(%s)가 호감상대로 등록되었습니다.".formatted(username), likeablePerson);
     }
 
     public List<LikeablePerson> findByFromInstaMemberId(Long fromInstaMemberId) {
@@ -93,6 +98,7 @@ public class LikeablePersonService {
                 if (likeablePerson.getAttractiveTypeCode() == attractiveTypeCode){
                     return RsData.of("F-1", "이미 등록된 사용자입니다.");
                 }
+                return RsData.of("F-2", "수정이 필요합니다.");
             }
         }
 

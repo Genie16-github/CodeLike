@@ -40,8 +40,11 @@ public class LikeablePersonController {
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/add")
     public String add(@Valid AddForm addForm) {
+        // 기존에 호감 표시를 한 적이 있는 상대인지 확인
         RsData<LikeablePerson> overlapCheckRsData = likeablePersonService.overlapCheck(rq.getMember(), addForm.getUsername(), addForm.getAttractiveTypeCode());
 
+        // 입력한 데이터가 로그인한 유저의 좋아요 정보 안에 있는 경우(중복 입력)
+        // 'F-' 로 시작하는 메시지를 전달 받았을 경우 historyBack
         if (overlapCheckRsData.isFail()) {
             return rq.historyBack(overlapCheckRsData);
         }
@@ -49,6 +52,12 @@ public class LikeablePersonController {
         RsData<LikeablePerson> createRsData = likeablePersonService.like(rq.getMember(), addForm.getUsername(), addForm.getAttractiveTypeCode());
 
         if (createRsData.isFail()) {
+            // 호감 목록에 10개의 데이터가 다 찬 경우
+            // 호감 목록으로 이동
+            if (createRsData.getResultCode().equals("F-3")) return rq.redirectWithMsg("/likeablePerson/list", createRsData);
+
+            // 본인의 인스타 아이디가 없는 경우
+            // 본인의 인스타 아이디에 호감 표시를 한 경우
             return rq.historyBack(createRsData);
         }
 
