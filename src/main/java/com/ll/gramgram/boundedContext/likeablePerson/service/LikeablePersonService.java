@@ -84,4 +84,18 @@ public class LikeablePersonService {
 
         return RsData.of("S-1", "삭제가능합니다.");
     }
+
+    public RsData<LikeablePerson> overlapCheck(Member member, String username, int attractiveTypeCode) {
+        InstaMember fromInstaMember = member.getInstaMember();
+
+        for (LikeablePerson likeablePerson : fromInstaMember.getFromLikeablePeople()){
+            if (likeablePerson.getToInstaMemberUsername().equals(username)){
+                if (likeablePerson.getAttractiveTypeCode() == attractiveTypeCode){
+                    return RsData.of("F-1", "이미 등록된 사용자입니다.");
+                }
+            }
+        }
+
+        return RsData.of("S-1", "추가 가능한 사용자입니다.");
+    }
 }

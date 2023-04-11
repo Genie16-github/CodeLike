@@ -8,8 +8,8 @@
 입력 시 기존 데이터 변경
 
 #### 케이스 4 : 중복 입력
-- [ ] 입력된 데이터의 username, attractiveTypeCode와 기존 데이터의 ToInstaMemberUsername과 attractiveTypeCode 비교
-- [ ] 두개가 모두 같으면 예외처리
+- [x] 입력된 데이터의 username, attractiveTypeCode와 기존 데이터의 ToInstaMemberUsername과 attractiveTypeCode 비교
+- [x] 두개가 모두 같으면 예외처리
   - "F-3", "이미 등록된 사용자입니다."
 
 #### 케이스 5 : 11명 이상에게 호감 표시

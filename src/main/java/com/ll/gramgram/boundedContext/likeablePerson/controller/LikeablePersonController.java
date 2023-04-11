@@ -40,6 +40,12 @@ public class LikeablePersonController {
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/add")
     public String add(@Valid AddForm addForm) {
+        RsData<LikeablePerson> overlapCheckRsData = likeablePersonService.overlapCheck(rq.getMember(), addForm.getUsername(), addForm.getAttractiveTypeCode());
+
+        if (overlapCheckRsData.isFail()) {
+            return rq.historyBack(overlapCheckRsData);
+        }
+
         RsData<LikeablePerson> createRsData = likeablePersonService.like(rq.getMember(), addForm.getUsername(), addForm.getAttractiveTypeCode());
 
         if (createRsData.isFail()) {
