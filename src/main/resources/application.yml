@@ -1,3 +1,6 @@
+custom:
+  likeablePerson:
+    max: 10
 spring:
   mvc:
     hiddenmethod:

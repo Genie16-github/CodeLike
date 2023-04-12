@@ -7,6 +7,8 @@ import com.ll.gramgram.boundedContext.likeablePerson.entity.LikeablePerson;
 import com.ll.gramgram.boundedContext.likeablePerson.repository.LikeablePersonRepository;
 import com.ll.gramgram.boundedContext.member.entity.Member;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +19,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class LikeablePersonService {
+    @Value("${custom.likeablePerson.max}")
+    private int likeablePersonMax;
     private final LikeablePersonRepository likeablePersonRepository;
     private final InstaMemberService instaMemberService;
 
@@ -34,7 +38,7 @@ public class LikeablePersonService {
         InstaMember toInstaMember = instaMemberService.findByUsernameOrCreate(username).getData();
 
         // 호감 목록에 10개 이상의 데이터가 있는 경우 더이상 추가하면 안된다.
-        if (fromInstaMember.getFromLikeablePeople().size() >= 10){
+        if (fromInstaMember.getFromLikeablePeople().size() >= likeablePersonMax){
             return RsData.of("F-3", "등록할 수 있는 호감 상대는 10명이 최대입니다.");
         }
 
