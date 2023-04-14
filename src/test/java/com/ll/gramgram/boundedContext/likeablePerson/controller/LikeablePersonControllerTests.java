@@ -1,10 +1,11 @@
 package com.ll.gramgram.boundedContext.likeablePerson.controller;
 
 
-import com.ll.gramgram.base.rsData.RsData;
+import com.ll.gramgram.base.rq.Rq;
 import com.ll.gramgram.boundedContext.likeablePerson.entity.LikeablePerson;
 import com.ll.gramgram.boundedContext.likeablePerson.repository.LikeablePersonRepository;
 import com.ll.gramgram.boundedContext.likeablePerson.service.LikeablePersonService;
+import com.ll.gramgram.boundedContext.member.entity.Member;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +14,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,6 +37,8 @@ public class LikeablePersonControllerTests {
     private LikeablePersonService likeablePersonService;
     @Autowired
     private LikeablePersonRepository likeablePersonRepository;
+    @Autowired
+    private Rq rq;
 
     @Test
     @DisplayName("등록 폼(인스타 인증을 안해서 폼 대신 메세지)")
@@ -227,9 +229,51 @@ public class LikeablePersonControllerTests {
     }
 
     @Test
+    @DisplayName("인스타아이디가 없는 회원은 대해서 호감표시를 할 수 없다.")
+    @WithUserDetails("user1")
+    void t009() throws Exception {
+        // WHEN
+        ResultActions resultActions = mvc
+                .perform(post("/likeablePerson/add")
+                        .with(csrf()) // CSRF 키 생성
+                        .param("username", "insta_user4")
+                        .param("attractiveTypeCode", "1")
+                )
+                .andDo(print());
+
+        // THEN
+        resultActions
+                .andExpect(handler().handlerType(LikeablePersonController.class))
+                .andExpect(handler().methodName("add"))
+                .andExpect(status().is4xxClientError());
+        ;
+    }
+
+    @Test
+    @DisplayName("본인이 본인에게 호감표시하면 안된다.")
+    @WithUserDetails("user3")
+    void t010() throws Exception {
+        // WHEN
+        ResultActions resultActions = mvc
+                .perform(post("/likeablePerson/add")
+                        .with(csrf()) // CSRF 키 생성
+                        .param("username", "insta_user3")
+                        .param("attractiveTypeCode", "1")
+                )
+                .andDo(print());
+
+        // THEN
+        resultActions
+                .andExpect(handler().handlerType(LikeablePersonController.class))
+                .andExpect(handler().methodName("add"))
+                .andExpect(status().is4xxClientError());
+        ;
+    }
+
+    @Test
     @DisplayName("같은 호감 상대 중복 입력 X(인스타 아이디와 매력 포인트가 전과 동일한 경우)")
     @WithUserDetails("user3")
-    void t009() throws Exception {
+    void t011() throws Exception {
         // WHEN
         ResultActions resultActions = mvc
                 .perform(post("/likeablePerson/add")
@@ -254,30 +298,8 @@ public class LikeablePersonControllerTests {
 
     @Test
     @DisplayName("호감 목록 11개 이상 추가X")
-    @WithUserDetails("user4")
-    void t010() throws Exception {
-        // `좋아요` 데이터 10개 추가(중복X)
-        for (int i = 1; i < 11; i++){
-            // WHEN
-            ResultActions resultActions = mvc
-                    .perform(post("/likeablePerson/add")
-                            .with(csrf()) // CSRF 키 생성
-                            .param("username", "insta_test" + i)
-                            .param("attractiveTypeCode", "1")
-                    )
-                    .andDo(print());
-            // THEN
-            resultActions
-                    .andExpect(handler().handlerType(LikeablePersonController.class))
-                    .andExpect(handler().methodName("add"))
-                    .andExpect(status().is3xxRedirection())
-            ;
-        }
-
-        List<LikeablePerson> likeablePeople = likeablePersonRepository.findByFromInstaMember_username("insta_user4");
-        // `좋아요` 데이터가 10개 추가 됐는지 확인
-        assertThat(likeablePeople.size()).isEqualTo(10);
-
+    @WithUserDetails("user5")
+    void t012() throws Exception {
         // `좋아요` 데이터를 하나 더 추가
         // WHEN
         ResultActions resultActions = mvc
@@ -301,14 +323,14 @@ public class LikeablePersonControllerTests {
         assertThat(likeablePerson).isNull(); // null 인지 확인
 
         // `insta_user4`의 호감 목록 데이터의 크기가 10개 그대로인지 확인
-        List<LikeablePerson> likeablePeople2 = likeablePersonRepository.findByFromInstaMember_username("insta_user4");
+        List<LikeablePerson> likeablePeople2 = likeablePersonRepository.findByFromInstaMember_username("insta_user5");
         assertThat(likeablePeople2.size()).isEqualTo(10);
     }
 
     @Test
     @DisplayName("매력 포인트를 다르게 입력하면 기존 데이터 수정")
     @WithUserDetails("user3")
-    void t011() throws Exception {
+    void t013() throws Exception {
         // WHEN
         ResultActions resultActions = mvc
                 .perform(post("/likeablePerson/add")

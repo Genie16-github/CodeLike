@@ -1,7 +1,9 @@
 package com.ll.gramgram.boundedContext.likeablePerson.service;
 
 import com.ll.gramgram.base.rsData.RsData;
+import com.ll.gramgram.boundedContext.instaMember.entity.InstaMember;
 import com.ll.gramgram.boundedContext.likeablePerson.entity.LikeablePerson;
+import com.ll.gramgram.boundedContext.likeablePerson.repository.LikeablePersonRepository;
 import com.ll.gramgram.boundedContext.member.entity.Member;
 import com.ll.gramgram.boundedContext.member.service.MemberService;
 import org.junit.jupiter.api.DisplayName;
@@ -22,65 +24,137 @@ public class LikeablePersonServiceTests {
     @Autowired
     private LikeablePersonService likeablePersonService;
     @Autowired
-    private MemberService memberService;
+    private LikeablePersonRepository likeablePersonRepository;
 
-//    @Test
-//    @DisplayName("같은 호감 상대 중복 입력 X")
-//    void t003() throws Exception {
-//        // ID가 user3인 Member 의 정보를 가져온다.
-//        Member member = memberService.findByUsername("user3").get();
-//
-//        // user3이 insta_user4에게 attractiveTypeCode를 1로해서 호감표시를 한다.
-//        // 기존에 user3의 좋아요 정보에 있는 데이터기 때문에 추가가 되면 안된다.
-//        RsData rsData  = likeablePersonService.like(member, "insta_user4", 1);
-//
-//        // 호감 표시 후의 user3의 좋아요 정보를 가져온다.
-//        List<LikeablePerson> list = member.getInstaMember().getFromLikeablePeople();
-//
-//        // 호감 표시 전과 후의 좋아요 리스트의 크기가 일치해야한다.
-//        // 중복된 데이터는 추가가 안되었기 때문
-//        assertThat(list.size()).isEqualTo(2);
-//    }
-//
-//    @Test
-//    @DisplayName("호감 목록 11개 이상 추가X")
-//    void t004() throws Exception {
-//        // ID가 user4인 Member 의 정보를 가져온다.
-//        Member member = memberService.findByUsername("user4").get();
-//
-//        // 호감 상대 10명 추가
-//        for (int i = 0; i < 10; i ++){
-//            likeablePersonService.like(member, "insta_test" + i, 1);
-//        }
-//
-//        // 호감 상대 1명 더 추가 -> 데이터가 삽입되면 안된다.
-//        likeablePersonService.like(member, "insta_test11", 1);
-//
-//        // user4의 좋아요 정보를 가져온다.
-//        List<LikeablePerson> list = member.getInstaMember().getFromLikeablePeople();
-//
-//        // 11번째 데이터는 추가되지 않아서 좋아요 리스트의 크기는 10이 돼야한다.
-//        assertThat(list.size()).isEqualTo(10);
-//    }
-//
-//    @Test
-//    @DisplayName("매력 포인트를 다르게 입력하면 기존 데이터 수정")
-//    void t005() throws Exception {
-//        // ID가 user3인 Member 의 정보를 가져온다.
-//        Member member = memberService.findByUsername("user3").get();
-//
-//        // user3이 insta_user4에게 attractiveTypeCode를 2로해서 호감표시를 한다.
-//        likeablePersonService.like(member, "insta_user4", 2);
-//
-//        // 호감 표시 후의 user3의 좋아요 정보를 가져온다.
-//        List<LikeablePerson> list = likeablePersonService.findByFromInstaMemberId(member.getInstaMember().getId());
-//
-//        // 좋아요 정보를 탐색하면서 toInstaMemberUsername이 insta_user4인 데이터를 찾는다.
-//        // 해당 데이터의 매력포인트가 2(성격)인지 확인한다.
-//        for (LikeablePerson likeablePerson : list){
-//            if (likeablePerson.getToInstaMemberUsername().equals("insta_user4")){
-//                assertThat(likeablePerson.getAttractiveTypeCode()).isEqualTo(2);
-//            }
-//        }
-//    }
+    @Test
+    @DisplayName("테스트 1")
+    void t001() throws Exception {
+        // 2번 좋아요 정보를 가져온다.
+        /*
+        SELECT *
+        FROM likeable_person
+        WHERE id = 2;
+        */
+        LikeablePerson likeablePersonId2 = likeablePersonService.findById(2L).get();
+
+        // 2번 좋아요를 발생시킨(호감을 표시한) 인스타회원을 가져온다.
+        // 그 회원의 인스타아이디는 insta_user3 이다.
+        /*
+        SELECT *
+        FROM insta_member
+        WHERE id = 2;
+        */
+        InstaMember instaMemberInstaUser3 = likeablePersonId2.getFromInstaMember();
+        assertThat(instaMemberInstaUser3.getUsername()).isEqualTo("insta_user3");
+
+        // 인스타아이디가 insta_user3 인 사람이 호감을 표시한 `좋아요` 목록
+        // 좋아요는 2가지로 구성되어 있다 : from(호감표시자), to(호감받은자)
+        /*
+        SELECT *
+        FROM likeable_person
+        WHERE from_insta_member_id = 2;
+        */
+        List<LikeablePerson> fromLikeablePeople = instaMemberInstaUser3.getFromLikeablePeople();
+
+        // 특정 회원이 호감을 표시한 좋아요 반복한다.
+        for (LikeablePerson likeablePerson : fromLikeablePeople) {
+            // 당연하게 그 특정회원(인스타아이디 instal_user3)이 좋아요의 호감표시자회원과 같은 사람이다.
+            assertThat(instaMemberInstaUser3.getUsername()).isEqualTo(likeablePerson.getFromInstaMember().getUsername());
+        }
+    }
+
+    @Test
+    @DisplayName("테스트 2")
+    void t002() throws Exception {
+        // 2번 좋아요 정보를 가져온다.
+        /*
+        SELECT *
+        FROM likeable_person
+        WHERE id = 2;
+        */
+        LikeablePerson likeablePersonId2 = likeablePersonService.findById(2L).get();
+
+        // 2번 좋아요를 발생시킨(호감을 표시한) 인스타회원을 가져온다.
+        // 그 회원의 인스타아이디는 insta_user3 이다.
+        /*
+        SELECT *
+        FROM insta_member
+        WHERE id = 2;
+        */
+        InstaMember instaMemberInstaUser3 = likeablePersonId2.getFromInstaMember();
+        assertThat(instaMemberInstaUser3.getUsername()).isEqualTo("insta_user3");
+
+        // 내가 새로 호감을 표시하려는 사람의 인스타 아이디
+        String usernameToLike = "insta_user4";
+
+        LikeablePerson oldLikeablePerson = instaMemberInstaUser3
+                .getFromLikeablePeople()
+                .stream()
+                .filter(lp -> lp.getToInstaMember().getUsername().equals(usernameToLike))
+                .findFirst()
+                .orElse(null);
+
+        if (oldLikeablePerson != null) {
+            System.out.println("이미 나(인스타아이디 : insta_user3)는 insta_user4에게 호감을 표시 했구나.");
+            System.out.println("기존 호감사유 : %s".formatted(oldLikeablePerson.getAttractiveTypeDisplayName()));
+        }
+    }
+
+    @Test
+    @DisplayName("테스트 4")
+    void t003() throws Exception {
+        // 좋아하는 사람이 2번 인스타 회원인 `좋아요` 검색
+        /*
+        SELECT l1_0.id,
+        l1_0.attractive_type_code,
+        l1_0.create_date,
+        l1_0.from_insta_member_id,
+        l1_0.from_insta_member_username,
+        l1_0.modify_date,
+        l1_0.to_insta_member_id,
+        l1_0.to_insta_member_username
+        FROM likeable_person l1_0
+        WHERE l1_0.from_insta_member_id = 2
+        */
+        List<LikeablePerson> likeablePeople = likeablePersonRepository.findByFromInstaMemberId(2L);
+
+        // 좋아하는 대상의 아이디가 insta_user100 인 `좋아요`들 만 검색
+        /*
+        SELECT l1_0.id,
+        l1_0.attractive_type_code,
+        l1_0.create_date,
+        l1_0.from_insta_member_id,
+        l1_0.from_insta_member_username,
+        l1_0.modify_date,
+        l1_0.to_insta_member_id,
+        l1_0.to_insta_member_username
+        FROM likeable_person l1_0
+        LEFT JOIN insta_member t1_0
+        ON t1_0.id=l1_0.to_insta_member_id
+        WHERE t1_0.username = "insta_user100";
+        */
+        List<LikeablePerson> likeablePeople2 = likeablePersonRepository.findByToInstaMember_username("insta_user100");
+
+        assertThat(likeablePeople2.get(0).getId()).isEqualTo(2);
+
+        // 좋아하는 사람이 2번 인스타 회원이고, 좋아하는 대상의 인스타아이디가 "insta_user100" 인 `좋아요`
+        /*
+        SELECT l1_0.id,
+        l1_0.attractive_type_code,
+        l1_0.create_date,
+        l1_0.from_insta_member_id,
+        l1_0.from_insta_member_username,
+        l1_0.modify_date,
+        l1_0.to_insta_member_id,
+        l1_0.to_insta_member_username
+        FROM likeable_person l1_0
+        LEFT JOIN insta_member t1_0
+        ON t1_0.id=l1_0.to_insta_member_id
+        WHERE l1_0.from_insta_member_id = 2
+        AND t1_0.username = "insta_user100";
+        */
+        LikeablePerson likeablePerson = likeablePersonRepository.findByFromInstaMemberIdAndToInstaMember_username(2L, "insta_user100");
+
+        assertThat(likeablePerson.getId()).isEqualTo(2);
+    }
 }
