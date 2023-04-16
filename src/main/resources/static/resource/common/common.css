@@ -14,8 +14,7 @@ html > body {
 .likeablePersonList {
     display: flex;
     align-items: center;
-    width: 450px;
-    background-color: #FAEBFF;
+    background-color: white;
     border-color: #A566FF;
     border-width: 2px;
     margin: 5px;
@@ -25,13 +24,12 @@ html > body {
 
 .toInstaMember_username {
     cursor: pointer;
-    width: auto;
-    min-width: 170px;
     font-weight: bold;
 }
 
 .toInstaMember_attractiveTypeDisplayName {
     margin-right: 50px;
+    flex-grow:1;
 }
 
 .a_delete {
