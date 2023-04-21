@@ -60,7 +60,7 @@ public class InstaMemberControllerTests {
                         <input type="radio" name="gender" value="M"
                         """.stripIndent().trim())))
                 .andExpect(content().string(containsString("""
-                        <input type="submit" value="정보입력"
+                        id="btn-insta-member-connect-1"
                         """.stripIndent().trim())));
     }
 
@@ -98,7 +98,7 @@ public class InstaMemberControllerTests {
                 .andExpect(handler().handlerType(InstaMemberController.class))
                 .andExpect(handler().methodName("connect"))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrlPattern("/likeablePerson/add**"));
+                .andExpect(redirectedUrlPattern("/likeablePerson/like**"));
 
         InstaMember instaMember = instaMemberService.findByUsername("abc123").orElse(null);
 
@@ -125,7 +125,7 @@ public class InstaMemberControllerTests {
                 .andExpect(handler().handlerType(InstaMemberController.class))
                 .andExpect(handler().methodName("connect"))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrlPattern("/likeablePerson/add**"));
+                .andExpect(redirectedUrlPattern("/likeablePerson/like**"));
 
         InstaMember instaMember = instaMemberService.findByUsername("insta_user100").orElse(null);
 
