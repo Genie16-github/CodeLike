@@ -6,7 +6,7 @@
 
 <body>
 
-<main layout:fragment="main">
+<main layout:fragment="main" class="flex-grow flex items-center justify-center">
     <script>
         function LoginForm__submit(form) {
             // username 이(가) 올바른지 체크
@@ -66,7 +66,7 @@
                 <input type="password" name="password" maxlength="30" placeholder="비빌번호" class="input input-bordered" />
             </div>
 
-            <button type="submit" class="btn btn-block btn-primary gap-1">
+            <button id="btn-login-1" type="submit" class="btn btn-block btn-primary gap-1">
                 <i class="fa-solid fa-arrow-right-to-bracket"></i>
                 <span>로그인</span>
             </button>
