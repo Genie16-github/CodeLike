@@ -1,5 +1,6 @@
 package com.ll.gramgram.boundedContext.likeablePerson.service;
 
+import com.ll.gramgram.base.appConfig.AppConfig;
 import com.ll.gramgram.base.rsData.RsData;
 import com.ll.gramgram.boundedContext.instaMember.entity.InstaMember;
 import com.ll.gramgram.boundedContext.instaMember.service.InstaMemberService;
@@ -19,8 +20,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class LikeablePersonService {
-    @Value("${custom.likeablePerson.max}")
-    private int likeablePersonMax;
     private final LikeablePersonRepository likeablePersonRepository;
     private final InstaMemberService instaMemberService;
 
@@ -118,7 +117,7 @@ public class LikeablePersonService {
             return RsData.of("F-3", "이미 %s님에 대해서 호감표시를 했습니다.".formatted(username));
         }
 
-        long likeablePersonFromMax = likeablePersonMax;
+        long likeablePersonFromMax = AppConfig.getLikeablePersonFromMax();
 
         if (fromLikeablePerson != null) {
             return RsData.of("S-2", "%s님에 대해서 호감표시가 가능합니다.".formatted(username));

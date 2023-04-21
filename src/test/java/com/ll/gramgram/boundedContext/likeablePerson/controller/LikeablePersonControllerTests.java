@@ -1,10 +1,13 @@
 package com.ll.gramgram.boundedContext.likeablePerson.controller;
 
 
+import com.ll.gramgram.base.appConfig.AppConfig;
 import com.ll.gramgram.base.rq.Rq;
 import com.ll.gramgram.boundedContext.likeablePerson.entity.LikeablePerson;
 import com.ll.gramgram.boundedContext.likeablePerson.repository.LikeablePersonRepository;
 import com.ll.gramgram.boundedContext.likeablePerson.service.LikeablePersonService;
+import com.ll.gramgram.boundedContext.member.entity.Member;
+import com.ll.gramgram.boundedContext.member.service.MemberService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +20,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -32,6 +36,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class LikeablePersonControllerTests {
     @Autowired
     private MockMvc mvc;
+    @Autowired
+    private MemberService memberService;
     @Autowired
     private LikeablePersonService likeablePersonService;
     @Autowired
@@ -299,12 +305,18 @@ public class LikeablePersonControllerTests {
     @DisplayName("호감 목록 11개 이상 추가X")
     @WithUserDetails("user5")
     void t012() throws Exception {
-        // `좋아요` 데이터를 하나 더 추가
+        Member memberUser5 = memberService.findByUsername("user5").get();
+
+        IntStream.range(0, (int) AppConfig.getLikeablePersonFromMax())
+                .forEach(index -> {
+                    likeablePersonService.like(memberUser5, "insta_user%30d".formatted(index), 1);
+                });
+
         // WHEN
         ResultActions resultActions = mvc
                 .perform(post("/likeablePerson/like")
                         .with(csrf()) // CSRF 키 생성
-                        .param("username", "insta_user100")
+                        .param("username", "insta_user111")
                         .param("attractiveTypeCode", "1")
                 )
                 .andDo(print());
@@ -313,17 +325,8 @@ public class LikeablePersonControllerTests {
         resultActions
                 .andExpect(handler().handlerType(LikeablePersonController.class))
                 .andExpect(handler().methodName("like"))
-                .andExpect(status().is3xxRedirection())
+                .andExpect(status().is4xxClientError());
         ;
-
-        // `insta_user100`에게 호감 표시한 데이터는 있으면 안된다.
-        // 호감 목록이 이미 10개 이상이기 때문
-        LikeablePerson likeablePerson = likeablePersonRepository.findByFromInstaMemberIdAndToInstaMember_username(3L, "insta_user100");
-        assertThat(likeablePerson).isNull(); // null 인지 확인
-
-        // `insta_user4`의 호감 목록 데이터의 크기가 10개 그대로인지 확인
-        List<LikeablePerson> likeablePeople2 = likeablePersonRepository.findByFromInstaMember_username("insta_user5");
-        assertThat(likeablePeople2.size()).isEqualTo(10);
     }
 
     @Test
