@@ -45,4 +45,12 @@ public class LikeablePerson {
             default -> "능력";
         };
     }
+
+    public String getAttractiveTypeDisplayNameWithIcon() {
+        return switch (attractiveTypeCode) {
+            case 1 -> "<i class=\"fa-regular fa-face-smile\"></i>";
+            case 2 -> "<i class=\"fa-regular fa-heart\"></i>";
+            default -> "<i class=\"fa-solid fa-sack-dollar\"></i>";
+        } + "&nbsp;" + getAttractiveTypeDisplayName();
+    }
 }
