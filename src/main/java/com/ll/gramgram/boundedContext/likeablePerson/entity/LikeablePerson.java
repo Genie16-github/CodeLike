@@ -1,5 +1,6 @@
 package com.ll.gramgram.boundedContext.likeablePerson.entity;
 
+import com.ll.gramgram.base.rsData.RsData;
 import com.ll.gramgram.boundedContext.instaMember.entity.InstaMember;
 import jakarta.persistence.*;
 import lombok.*;
@@ -18,7 +19,6 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @ToString
 @Entity
 @Getter
-@Setter
 public class LikeablePerson {
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -38,11 +38,28 @@ public class LikeablePerson {
     private String toInstaMemberUsername; // 혹시 몰라서 기록
     private int attractiveTypeCode; // 매력포인트(1=외모, 2=성격, 3=능력)
 
+    public RsData updateAttractionTypeCode(int attractiveTypeCode) {
+        if (this.attractiveTypeCode == attractiveTypeCode) {
+            return RsData.of("F-1", "이미 설정되었습니다.");
+        }
+        this.attractiveTypeCode = attractiveTypeCode;
+
+        return RsData.of("S-1", "성공");
+    }
+
     public String getAttractiveTypeDisplayName() {
         return switch (attractiveTypeCode) {
             case 1 -> "외모";
             case 2 -> "성격";
             default -> "능력";
         };
+    }
+
+    public String getAttractiveTypeDisplayNameWithIcon() {
+        return switch (attractiveTypeCode) {
+            case 1 -> "<i class=\"fa-regular fa-face-smile\"></i>";
+            case 2 -> "<i class=\"fa-regular fa-heart\"></i>";
+            default -> "<i class=\"fa-solid fa-sack-dollar\"></i>";
+        } + "&nbsp;" + getAttractiveTypeDisplayName();
     }
 }

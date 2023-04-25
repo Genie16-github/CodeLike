@@ -6,6 +6,7 @@ import com.ll.gramgram.boundedContext.instaMember.entity.InstaMember;
 import com.ll.gramgram.boundedContext.likeablePerson.entity.LikeablePerson;
 import com.ll.gramgram.boundedContext.likeablePerson.service.LikeablePersonService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +19,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Controller
-@RequestMapping("/likeablePerson")
+@RequestMapping("/usr/likeablePerson")
 @RequiredArgsConstructor
 public class LikeablePersonController {
     private final Rq rq;
@@ -33,7 +34,12 @@ public class LikeablePersonController {
     @AllArgsConstructor
     @Getter
     public static class LikeForm {
+        @NotBlank
+        @Size(min = 3, max = 30)
         private final String username;
+        @NotNull
+        @Min(1)
+        @Max(3)
         private final int attractiveTypeCode;
     }
 
@@ -46,7 +52,7 @@ public class LikeablePersonController {
             return rq.historyBack(rsData);
         }
 
-        return rq.redirectWithMsg("/likeablePerson/list", rsData);
+        return rq.redirectWithMsg("/usr/likeablePerson/list", rsData);
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -70,17 +76,52 @@ public class LikeablePersonController {
         LikeablePerson likeablePerson = likeablePersonService.findById(id).orElse(null);
 
         // 삭제를 시도하는 유저가 권한이 있는지 확인. 소유권 확인
-        RsData<LikeablePerson> canActorDeleteRsData = likeablePersonService.canActorDelete(rq.getMember(), likeablePerson);
+        RsData<LikeablePerson> canDeleteRsData = likeablePersonService.canActorDelete(rq.getMember(), likeablePerson);
 
         // 'F-' 로 시작하는 메시지를 전달 받았을 경우
-        if (canActorDeleteRsData.isFail()) return rq.historyBack(canActorDeleteRsData);
+        if (canDeleteRsData.isFail()) return rq.historyBack(canDeleteRsData);
 
         // likeablePerson 객체가 null 이 아닐 경우 삭제
-        RsData<LikeablePerson> deleteRsData = likeablePersonService.delete(Objects.requireNonNull(likeablePerson));
+        RsData<LikeablePerson> deleteRsData = likeablePersonService.cancel(Objects.requireNonNull(likeablePerson));
 
         // 'S-' 로 시작하는 메시지를 전달 받지 못했을 경우
         if (deleteRsData.isFail()) return rq.historyBack(deleteRsData);
 
-        return rq.redirectWithMsg("/likeablePerson/list", deleteRsData); // deleteRsData : "S-1", "xxx 님에 대한 호감을 취소하였습니다."
+        return rq.redirectWithMsg("/usr/likeablePerson/list", deleteRsData); // deleteRsData : "S-1", "xxx 님에 대한 호감을 취소하였습니다."
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/modify/{id}")
+    public String showModify(@PathVariable Long id, Model model) {
+        LikeablePerson likeablePerson = likeablePersonService.findById(id).orElseThrow();
+
+        RsData canModifyRsData = likeablePersonService.canModifyLike(rq.getMember(), likeablePerson);
+
+        if (canModifyRsData.isFail()) return rq.historyBack(canModifyRsData);
+
+        model.addAttribute("likeablePerson", likeablePerson);
+
+        return "usr/likeablePerson/modify";
+    }
+
+    @AllArgsConstructor
+    @Getter
+    public static class ModifyForm {
+        @NotNull
+        @Min(1)
+        @Max(3)
+        private final int attractiveTypeCode;
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/modify/{id}")
+    public String modify(@PathVariable Long id, @Valid ModifyForm modifyForm) {
+        RsData<LikeablePerson> rsData = likeablePersonService.modifyAttractive(rq.getMember(), id, modifyForm.getAttractiveTypeCode());
+
+        if (rsData.isFail()) {
+            return rq.historyBack(rsData);
+        }
+
+        return rq.redirectWithMsg("/usr/likeablePerson/list", rsData);
     }
 }
