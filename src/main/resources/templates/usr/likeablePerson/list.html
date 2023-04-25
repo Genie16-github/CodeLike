@@ -33,8 +33,8 @@
                                       th:text="${likeablePerson.toInstaMember.username}"></span>
                             </h2>
                             <a th:href="|https://instagram.com/${likeablePerson.toInstaMember.username}|"
-                               target="_blank" class="block text-sm break-all text-blue-400 underline">
-                                <span>https://instagram.com/</span><span class="text-red-400"
+                               target="_blank" class="block text-sm break-all text-blue-500 underline">
+                                <span>https://instagram.com/</span><span class="text-blue-600" style="font-weight: bold"
                                                                          th:text="${likeablePerson.toInstaMember.username}"></span>
                             </a>
 
@@ -46,9 +46,12 @@
                             </div>
 
                             <div class="card-actions justify-end">
-                                <a class="btn btn-sm btn-outline">호감사유 변경</a>
+                                <a th:href="@{|modify/${likeablePerson.id}|}" class="btn btn-sm btn-outline">
+                                    <i class="fa-solid fa-pen-to-square"></i>
+                                    &nbsp;호감사유 변경</a>
                                 <a class="btn btn-sm btn-outline" href="javascript:;"
-                                   onclick="if ( confirm('정말로 취소하시겠습니까?') ) $(this).next().submit();">호감취소</a>
+                                   onclick="if ( confirm('정말로 취소하시겠습니까?') ) $(this).next().submit();">
+                                    <i class="fa-solid fa-heart-crack"></i>&nbsp;호감취소</a>
                                 <form hidden th:action="@{|/likeablePerson/${likeablePerson.id}|}" method="POST">
                                     <input type="hidden" name="_method" value="delete">
                                 </form>
