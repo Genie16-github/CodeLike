@@ -73,7 +73,6 @@ public class LikeablePersonControllerTests {
         ResultActions resultActions = mvc
                 .perform(get("/likeablePerson/like"))
                 .andDo(print());
-
         // THEN
         resultActions
                 .andExpect(handler().handlerType(LikeablePersonController.class))
@@ -83,13 +82,13 @@ public class LikeablePersonControllerTests {
                         <input type="text" name="username"
                         """.stripIndent().trim())))
                 .andExpect(content().string(containsString("""
-                        <input type="radio" name="attractiveTypeCode" value="1"
+                        <input class="radio" type="radio" name="attractiveTypeCode" value="1"
                         """.stripIndent().trim())))
                 .andExpect(content().string(containsString("""
-                        <input type="radio" name="attractiveTypeCode" value="2"
+                        <input class="radio" type="radio" name="attractiveTypeCode" value="2"
                         """.stripIndent().trim())))
                 .andExpect(content().string(containsString("""
-                        <input type="radio" name="attractiveTypeCode" value="3"
+                        <input class="radio" type="radio" name="attractiveTypeCode" value="3"
                         """.stripIndent().trim())))
                 .andExpect(content().string(containsString("""
                         id="btn-like-1"
@@ -385,4 +384,24 @@ public class LikeablePersonControllerTests {
         ;
     }
 
+    @Test
+    @DisplayName("수정 폼 처리")
+    @WithUserDetails("user3")
+    void t015() throws Exception {
+        // WHEN
+        ResultActions resultActions = mvc
+                .perform(post("/likeablePerson/modify/2")
+                        .with(csrf()) // CSRF 키 생성
+                        .param("username", "abcd")
+                        .param("attractiveTypeCode", "3")
+                )
+                .andDo(print());
+
+        // THEN
+        resultActions
+                .andExpect(handler().handlerType(LikeablePersonController.class))
+                .andExpect(handler().methodName("modify"))
+                .andExpect(status().is3xxRedirection());
+        ;
+    }
 }
