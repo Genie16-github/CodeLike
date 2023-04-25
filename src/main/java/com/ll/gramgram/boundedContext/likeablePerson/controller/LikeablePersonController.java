@@ -37,7 +37,6 @@ public class LikeablePersonController {
         @NotBlank
         @Size(min = 3, max = 30)
         private final String username;
-        @NotBlank
         @NotNull
         @Min(1)
         @Max(3)
@@ -83,7 +82,7 @@ public class LikeablePersonController {
         if (canDeleteRsData.isFail()) return rq.historyBack(canDeleteRsData);
 
         // likeablePerson 객체가 null 이 아닐 경우 삭제
-        RsData<LikeablePerson> deleteRsData = likeablePersonService.delete(Objects.requireNonNull(likeablePerson));
+        RsData<LikeablePerson> deleteRsData = likeablePersonService.cancel(Objects.requireNonNull(likeablePerson));
 
         // 'S-' 로 시작하는 메시지를 전달 받지 못했을 경우
         if (deleteRsData.isFail()) return rq.historyBack(deleteRsData);
