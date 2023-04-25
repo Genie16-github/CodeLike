@@ -18,7 +18,6 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @ToString
 @Entity
 @Getter
-@Setter
 public class LikeablePerson {
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -37,6 +36,18 @@ public class LikeablePerson {
     private InstaMember toInstaMember; // 호감을 받은 사람(인스타 멤버)
     private String toInstaMemberUsername; // 혹시 몰라서 기록
     private int attractiveTypeCode; // 매력포인트(1=외모, 2=성격, 3=능력)
+
+    public boolean updateAttractionTypeCode(int attractiveTypeCode) {
+        if (this.attractiveTypeCode == attractiveTypeCode) {
+            return false;
+        }
+
+        toInstaMember.decreaseLikesCount(fromInstaMember.getGender(), this.attractiveTypeCode);
+        toInstaMember.increaseLikesCount(fromInstaMember.getGender(), attractiveTypeCode);
+
+        this.attractiveTypeCode = attractiveTypeCode;
+        return true;
+    }
 
     public String getAttractiveTypeDisplayName() {
         return switch (attractiveTypeCode) {
