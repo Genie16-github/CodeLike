@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Controller
-@RequestMapping("/likeablePerson")
+@RequestMapping("/usr/likeablePerson")
 @RequiredArgsConstructor
 public class LikeablePersonController {
     private final Rq rq;
@@ -46,7 +46,7 @@ public class LikeablePersonController {
             return rq.historyBack(rsData);
         }
 
-        return rq.redirectWithMsg("/likeablePerson/list", rsData);
+        return rq.redirectWithMsg("/usr/likeablePerson/list", rsData);
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -81,7 +81,7 @@ public class LikeablePersonController {
         // 'S-' 로 시작하는 메시지를 전달 받지 못했을 경우
         if (deleteRsData.isFail()) return rq.historyBack(deleteRsData);
 
-        return rq.redirectWithMsg("/likeablePerson/list", deleteRsData); // deleteRsData : "S-1", "xxx 님에 대한 호감을 취소하였습니다."
+        return rq.redirectWithMsg("/usr/likeablePerson/list", deleteRsData); // deleteRsData : "S-1", "xxx 님에 대한 호감을 취소하였습니다."
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -113,6 +113,6 @@ public class LikeablePersonController {
             return rq.historyBack(rsData);
         }
 
-        return rq.redirectWithMsg("/likeablePerson/list", rsData);
+        return rq.redirectWithMsg("/usr/likeablePerson/list", rsData);
     }
 }
