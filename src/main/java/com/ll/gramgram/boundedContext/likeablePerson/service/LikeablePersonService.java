@@ -76,7 +76,7 @@ public class LikeablePersonService {
         long timeDiff = checkTimeDiff(likeablePerson.getModifyDate());
         if (timeDiff < changeableTime) {
             String str = transTimeFormat(timeDiff);
-            return RsData.of("F-1", str + "후에 삭제가 가능합니다.");
+            return RsData.of("F-1", str + "후에 취소가 가능합니다.");
         };
         publisher.publishEvent(new EventBeforeCancelLike(this, likeablePerson));
 
