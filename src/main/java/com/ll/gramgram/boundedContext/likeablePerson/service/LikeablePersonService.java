@@ -75,9 +75,10 @@ public class LikeablePersonService {
     public RsData<LikeablePerson> cancel(LikeablePerson likeablePerson) {
         long timeDiff = checkTimeDiff(likeablePerson.getModifyDate());
         if (timeDiff < changeableTime) {
-            String str = transTimeFormat(timeDiff);
-            return RsData.of("F-1", str + "후에 취소가 가능합니다.");
-        };
+            String changeableTimeStr = transTimeFormat(timeDiff);
+            return RsData.of("F-1", changeableTimeStr + "후에 취소가 가능합니다.");
+        }
+
         publisher.publishEvent(new EventBeforeCancelLike(this, likeablePerson));
 
         // 너가 생성한 좋아요가 사라졌어.
@@ -94,7 +95,7 @@ public class LikeablePersonService {
 
     public RsData<LikeablePerson> canActorDelete(Member actor, LikeablePerson likeablePerson) {
         // 찾은 객체가 없다면 에러 메시지 출력
-        if (likeablePerson == null) return RsData.of("F-1", "이미 삭제되었습니다.");
+        if (likeablePerson == null) return RsData.of("F-1", "이미 취소되었습니다.");
 
         // 수행자의 인스타계정 번호
         long actorInstaMemberId = actor.getInstaMember().getId();
@@ -105,7 +106,7 @@ public class LikeablePersonService {
         if (actorInstaMemberId != fromInstaMemberId)
             return RsData.of("F-2", "권한이 없습니다.");
 
-        return RsData.of("S-1", "삭제가능합니다.");
+        return RsData.of("S-1", "취소 가능합니다.");
     }
 
     private RsData canLike(Member actor, String username, int attractiveTypeCode) {
@@ -212,20 +213,19 @@ public class LikeablePersonService {
         }
 
         long timeDiff = checkTimeDiff(likeablePerson.getModifyDate());
-        System.out.println("aaaaaaaaa" + changeableTime);
         if (timeDiff < changeableTime) {
-            String str = transTimeFormat(timeDiff);
-            return RsData.of("F-3", str + "후에 수정이 가능합니다.");
-        };
+            String changeableTimeStr = transTimeFormat(timeDiff);
+            return RsData.of("F-3", changeableTimeStr + "후에 수정이 가능합니다.");
+        }
 
         InstaMember fromInstaMember = actor.getInstaMember();
 
         if (!Objects.equals(likeablePerson.getFromInstaMember().getId(), fromInstaMember.getId())) {
-            return RsData.of("F-2", "해당 호감표시를 취소할 권한이 없습니다.");
+            return RsData.of("F-2", "해당 호감표시를 수정할 권한이 없습니다.");
         }
 
 
-        return RsData.of("S-1", "호감표시취소가 가능합니다.");
+        return RsData.of("S-1", "호감표시 취소가 가능합니다.");
     }
 
     public long checkTimeDiff(LocalDateTime localDateTime) {
