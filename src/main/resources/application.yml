@@ -1,6 +1,7 @@
 custom:
   likeablePerson:
     max: 10
+    time: 10800
 spring:
   mvc:
     hiddenmethod:
