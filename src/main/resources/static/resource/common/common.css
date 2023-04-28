@@ -11,30 +11,6 @@ html > body {
     word-break: keep-all;
 }
 
-.likeablePersonList {
-    display: flex;
-    align-items: center;
-    background-color: white;
-    border-color: #A566FF;
-    border-width: 2px;
-    margin: 5px;
-    padding: 20px;
-    border-radius: 20px;
-}
-
-.toInstaMember_username {
-    cursor: pointer;
-    font-weight: bold;
-}
-
-.toInstaMember_attractiveTypeDisplayName {
-    margin-right: 50px;
-    flex-grow:1;
-}
-
-.a_delete {
-    border-radius: 10px;
-    background-color: red;
-    color: white;
-    padding: 5px;
+html > body .label-text {
+    font-size: 1rem;
 }
