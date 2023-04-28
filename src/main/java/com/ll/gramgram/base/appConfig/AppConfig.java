@@ -8,17 +8,9 @@ import org.springframework.context.annotation.Configuration;
 public class AppConfig {
     @Getter
     private static long likeablePersonFromMax;
-    @Getter
-    private static long changeableTime;
 
     @Value("${custom.likeablePerson.max}")
     public void setLikeablePersonFromMax(long likeablePersonFromMax) {
         AppConfig.likeablePersonFromMax = likeablePersonFromMax;
     }
-
-    @Value("${custom.likeablePerson.time}")
-    public void setChangeableTime(long changeableTime) {
-        AppConfig.changeableTime = changeableTime;
-    }
-
 }

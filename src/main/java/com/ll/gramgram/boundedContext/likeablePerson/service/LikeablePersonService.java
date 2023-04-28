@@ -15,8 +15,6 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -28,7 +26,6 @@ public class LikeablePersonService {
     private final LikeablePersonRepository likeablePersonRepository;
     private final InstaMemberService instaMemberService;
     private final ApplicationEventPublisher publisher;
-    private final long changeableTime = AppConfig.getChangeableTime();
 
     @Transactional
     public RsData<LikeablePerson> like(Member actor, String username, int attractiveTypeCode) {
@@ -73,11 +70,6 @@ public class LikeablePersonService {
 
     @Transactional
     public RsData<LikeablePerson> cancel(LikeablePerson likeablePerson) {
-        long timeDiff = checkTimeDiff(likeablePerson.getModifyDate());
-        if (timeDiff < changeableTime) {
-            String changeableTimeStr = transTimeFormat(timeDiff);
-            return RsData.of("F-1", changeableTimeStr + "후에 취소가 가능합니다.");
-        }
 
         publisher.publishEvent(new EventBeforeCancelLike(this, likeablePerson));
 
@@ -212,12 +204,6 @@ public class LikeablePersonService {
             return RsData.of("F-1", "먼저 본인의 인스타그램 아이디를 입력해주세요.");
         }
 
-        long timeDiff = checkTimeDiff(likeablePerson.getModifyDate());
-        if (timeDiff < changeableTime) {
-            String changeableTimeStr = transTimeFormat(timeDiff);
-            return RsData.of("F-3", changeableTimeStr + "후에 수정이 가능합니다.");
-        }
-
         InstaMember fromInstaMember = actor.getInstaMember();
 
         if (!Objects.equals(likeablePerson.getFromInstaMember().getId(), fromInstaMember.getId())) {
@@ -226,19 +212,5 @@ public class LikeablePersonService {
 
 
         return RsData.of("S-1", "호감표시 취소가 가능합니다.");
-    }
-
-    public long checkTimeDiff(LocalDateTime localDateTime) {
-        long diff = ChronoUnit.SECONDS.between(localDateTime, LocalDateTime.now());
-        return diff;
-    }
-
-    public String transTimeFormat(long time) {
-        time = changeableTime - time;
-        long hour = time / 3600; // 시
-        long minute = time % 3600 / 60; // 분
-        long second = time % 3600 % 60; // 초
-
-        return hour + "시 " + minute + "분 " + second + "초";
     }
 }
