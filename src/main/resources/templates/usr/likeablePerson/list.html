@@ -69,7 +69,7 @@
                                 <a th:href="@{|modify/${likeablePerson.id}|}" class="btn btn-sm btn-outline">
                                     <i class="fa-solid fa-pen-to-square"></i>
                                     &nbsp;호감사유 변경</a>
-                                <a class="btn btn-sm btn-outline" href="javascript:;"
+                                <a class="btn btn-sm btn-outline" href="javascript:"
                                    onclick="if ( confirm('정말로 취소하시겠습니까?') ) $(this).next().submit();">
                                     <i class="fa-solid fa-heart-crack"></i>&nbsp;호감취소</a>
                                 <form hidden th:action="@{|/usr/likeablePerson/${likeablePerson.id}|}" method="POST">

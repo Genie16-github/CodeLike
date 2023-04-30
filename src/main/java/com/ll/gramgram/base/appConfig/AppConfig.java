@@ -4,6 +4,8 @@ import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
+import java.time.LocalDateTime;
+
 @Configuration
 public class AppConfig {
     @Getter
@@ -22,6 +24,10 @@ public class AppConfig {
         AppConfig.likeablePersonModifyCoolTime = likeablePersonModifyCoolTime;
     }
 
+    public static LocalDateTime genLikeablePersonModifyUnlockDate() {
+        return LocalDateTime.now().plusSeconds(likeablePersonModifyCoolTime);
+    }
+
     @Getter
     private static long likeablePersonCancelCoolTime;
 
@@ -29,4 +35,6 @@ public class AppConfig {
     public void setLikeablePersonCancelCoolTime(long likeablePersonCancelCoolTime) {
         AppConfig.likeablePersonCancelCoolTime = likeablePersonCancelCoolTime;
     }
+
+
 }
