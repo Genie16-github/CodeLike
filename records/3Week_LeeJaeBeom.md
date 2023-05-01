@@ -6,11 +6,14 @@
  - [x] 설정정보 가져오기
  - [x] 호감표시/호감사유변경 시에 modifyUnlockDate 갱신(현재날짜 + 쿨타임)
  - [x] UI에서 쿨타임 안차면 수정/삭제 못 하도록
- - [ ] LikeablePersonService::canDelete, LikeablePersonService::canLike 에 쿨타임 체크 추가
+ - [x] LikeablePersonService::canDelete, LikeablePersonService::canLike 에 쿨타임 체크 추가
 
 #### 알림기능 구현
 
 #### 페이스북 로그인, 인스타 API
+ - [x] 페이스북 로그인 구현
+ - [x] 다른 소셜 로그인 redirect url 변경
+ - [x] 인스타 로그인을 했을 때 id, username 값 가져오기
 
 #### 네이버 클라우드 플랫폼을 통한 배포
 
@@ -31,7 +34,8 @@
  - 각각의 알림은 생성시에 `readDate`가 `null`이고, 사용자가 알림을 읽으면 `readDate`가 `현재날짜`로 세팅되도록 작성
 
 **[접근 방법]**
-
+ - 호감사유 수정/호감취소 불가능한 시간일 때 url 로 접근하는 것을 막아야겠다.
+   - isModifyUnlocked() 메소드 이용하여 쿨타임 체크
 
 
 
