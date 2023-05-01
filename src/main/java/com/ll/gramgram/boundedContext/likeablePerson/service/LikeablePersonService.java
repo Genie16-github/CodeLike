@@ -87,7 +87,7 @@ public class LikeablePersonService {
         return RsData.of("S-1", "%s님에 대한 호감을 취소하였습니다.".formatted(likeCanceledUsername));
     }
 
-    public RsData<LikeablePerson> canActorDelete(Member actor, LikeablePerson likeablePerson) {
+    public RsData<LikeablePerson> canActorCancel(Member actor, LikeablePerson likeablePerson) {
         // 찾은 객체가 없다면 에러 메시지 출력
         if (likeablePerson == null) return RsData.of("F-1", "이미 취소되었습니다.");
 
@@ -99,6 +99,11 @@ public class LikeablePersonService {
         // 지금 현재 로그인한 사용자의 인스타 아이디와 likeablePerson 객체의 FromInstaMember 데이터가 일치하지 않을 경우
         if (actorInstaMemberId != fromInstaMemberId)
             return RsData.of("F-2", "권한이 없습니다.");
+
+        // 호감 취소 버튼을 누르지 않고 url 로 접근하는 것을 막음
+        if (!likeablePerson.isModifyUnlocked()) {
+            return RsData.of("F-3", "삭제 가능 시간이 아닙니다.");
+        }
 
         return RsData.of("S-1", "취소 가능합니다.");
     }
@@ -214,6 +219,10 @@ public class LikeablePersonService {
             return RsData.of("F-2", "해당 호감표시를 수정할 권한이 없습니다.");
         }
 
+        // 호감사유 변경 버튼을 누르지 않고 url 로 접근하는 것을 막음
+        if (!likeablePerson.isModifyUnlocked()) {
+            return RsData.of("F-3", "수정 가능 시간이 아닙니다.");
+        }
 
         return RsData.of("S-1", "호감표시 취소가 가능합니다.");
     }

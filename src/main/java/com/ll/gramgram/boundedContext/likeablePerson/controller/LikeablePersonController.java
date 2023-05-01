@@ -76,7 +76,7 @@ public class LikeablePersonController {
         LikeablePerson likeablePerson = likeablePersonService.findById(id).orElse(null);
 
         // 삭제를 시도하는 유저가 권한이 있는지 확인. 소유권 확인
-        RsData<LikeablePerson> canDeleteRsData = likeablePersonService.canActorDelete(rq.getMember(), likeablePerson);
+        RsData<LikeablePerson> canDeleteRsData = likeablePersonService.canActorCancel(rq.getMember(), likeablePerson);
 
         // 'F-' 로 시작하는 메시지를 전달 받았을 경우
         if (canDeleteRsData.isFail()) return rq.historyBack(canDeleteRsData);
