@@ -8,6 +8,7 @@ import com.ll.gramgram.boundedContext.instaMember.repository.InstaMemberSnapshot
 import com.ll.gramgram.boundedContext.likeablePerson.entity.LikeablePerson;
 import com.ll.gramgram.boundedContext.member.entity.Member;
 import com.ll.gramgram.boundedContext.member.service.MemberService;
+import com.ll.gramgram.boundedContext.notification.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +21,7 @@ import java.util.Optional;
 public class InstaMemberService {
     private final InstaMemberRepository instaMemberRepository;
     private final MemberService memberService;
+    private final NotificationService notificationService;
     private final InstaMemberSnapshotRepository instaMemberSnapshotRepository;
 
     public Optional<InstaMember> findByUsername(String username) {
@@ -113,7 +115,8 @@ public class InstaMemberService {
 
         saveSnapshot(snapshot);
 
-        // 알림
+        // 좋아요(Like) 알림 등록
+        notificationService.likeNotification(likeablePerson, "Like");
     }
 
     public void whenBeforeCancelLike(LikeablePerson likeablePerson) {

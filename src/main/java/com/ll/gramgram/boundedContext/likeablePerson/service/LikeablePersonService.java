@@ -10,7 +10,6 @@ import com.ll.gramgram.boundedContext.instaMember.service.InstaMemberService;
 import com.ll.gramgram.boundedContext.likeablePerson.entity.LikeablePerson;
 import com.ll.gramgram.boundedContext.likeablePerson.repository.LikeablePersonRepository;
 import com.ll.gramgram.boundedContext.member.entity.Member;
-import com.ll.gramgram.boundedContext.notification.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -26,7 +25,6 @@ import java.util.Optional;
 public class LikeablePersonService {
     private final LikeablePersonRepository likeablePersonRepository;
     private final InstaMemberService instaMemberService;
-    private final NotificationService notificationService;
     private final ApplicationEventPublisher publisher;
 
     @Transactional
@@ -52,9 +50,6 @@ public class LikeablePersonService {
                 .build();
 
         likeablePersonRepository.save(likeablePerson); // 저장
-
-        // 좋아요(Like) 알림 등록
-        notificationService.likeNotification(likeablePerson, "Like");
 
         // 너가 좋아하는 호감표시 생겼어.
         fromInstaMember.addFromLikeablePerson(likeablePerson);
