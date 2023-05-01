@@ -45,6 +45,7 @@ public class LikeablePersonService {
                 .toInstaMember(toInstaMember) // 호감을 받는 사람의 인스타 멤버
                 .toInstaMemberUsername(toInstaMember.getUsername()) // 중요하지 않음
                 .attractiveTypeCode(attractiveTypeCode) // 1=외모, 2=능력, 3=성격
+                // 호감 표시했을 때 수정/삭제 가능 시간 설정
                 .modifyUnlockDate(AppConfig.genLikeablePersonModifyUnlockDate())
                 .build();
 
@@ -194,6 +195,7 @@ public class LikeablePersonService {
 
     private void modifyAttractionTypeCode(LikeablePerson likeablePerson, int attractiveTypeCode) {
         int oldAttractiveTypeCode = likeablePerson.getAttractiveTypeCode();
+        // attractionTypeCode를 갱신하면서 수정/삭제 가능 시간도 갱신
         RsData rsData = likeablePerson.updateAttractionTypeCode(attractiveTypeCode);
 
         if (rsData.isSuccess()) {

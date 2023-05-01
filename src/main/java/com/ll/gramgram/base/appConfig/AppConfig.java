@@ -25,6 +25,8 @@ public class AppConfig {
     }
 
     public static LocalDateTime genLikeablePersonModifyUnlockDate() {
+        // 호감 사유를 수정했을 때 쿨타임 설정
+        // 현재 시간에 likeablePersonModifyCoolTime(60 * 60 * 3, 3시간)을 더한다.
         return LocalDateTime.now().plusSeconds(likeablePersonModifyCoolTime);
     }
 }

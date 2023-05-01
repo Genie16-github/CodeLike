@@ -12,6 +12,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
 
@@ -41,8 +42,21 @@ public class LikeablePerson extends BaseEntity {
     }
 
     // 초 단위에서 올림 해주세요.
-    public String getModifyUnlockDateRemainStrHuman() {
-        return "2시간 16분";
+    public String getModifyUnlockTimeRemainStrHuman() {
+        // 남은 수정 가능 시간(쿨타임) = 수정 가능 시간 - 현재 시간
+        // SECONDS : 초단위로 계산 -> 변환 필요
+        long modifyUnlockTimeRemain = ChronoUnit.SECONDS.between(LocalDateTime.now(), modifyUnlockDate);
+        return transTimeFormat(modifyUnlockTimeRemain);
+    }
+
+    public String transTimeFormat(long time) {
+        // 초단위의 시간을 시, 분으로 변환
+        long hour = time / 3600; // 시
+        long minute = time % 3600 / 60; // 분
+        long second = time % 3600 % 60; // 초
+        if (hour == 0 && minute == 0) return second + "초";
+
+        return hour + "시간 " + minute + "분";
     }
 
     public RsData updateAttractionTypeCode(int attractiveTypeCode) {
@@ -50,6 +64,7 @@ public class LikeablePerson extends BaseEntity {
             return RsData.of("F-1", "이미 설정되었습니다.");
         }
         this.attractiveTypeCode = attractiveTypeCode;
+        // 호감 사유 갱신하면서 수정 가능 시간도 갱신
         this.modifyUnlockDate = AppConfig.genLikeablePersonModifyUnlockDate();
 
         return RsData.of("S-1", "성공");
