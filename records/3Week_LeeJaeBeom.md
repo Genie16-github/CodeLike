@@ -7,8 +7,13 @@
  - [x] 호감표시/호감사유변경 시에 modifyUnlockDate 갱신(현재날짜 + 쿨타임)
  - [x] UI에서 쿨타임 안차면 수정/삭제 못 하도록
  - [x] LikeablePersonService::canDelete, LikeablePersonService::canLike 에 쿨타임 체크 추가
+ - [x] 테스트 코드 작성
 
 #### 알림기능 구현
+ - [x] 호감표시 했을 때 알림 페이지에서 좋아요 알림 확인 가능
+ - [x] 호감사유 수정 시 알림 페이지에서 수정 알림 확인 가능
+ - [x] 알림 리스트 최신순 정렬
+ - [x] 테스트 코드 작성
 
 #### 페이스북 로그인, 인스타 API
  - [x] 페이스북 로그인 구현
@@ -36,8 +41,11 @@
 **[접근 방법]**
  - 호감사유 수정/호감취소 불가능한 시간일 때 url 로 접근하는 것을 막아야겠다.
    - isModifyUnlocked() 메소드 이용하여 쿨타임 체크
-
-
+   - canLike, canCancel 에서 `modifyUnlockDate` < `LocalDateTime.now()` 이면 실패 코드 리턴
+ - LikeablePersonService 단에서 NotificationService 변수 선언 후 알림 추가 메소드 구현
+   -> 결합도가 낮은 방법X
+ - notificationEventListener 구현. `EventAfterLike`, `EventAfterModifyAttractive` 이벤트 발행 시 동작
+   -> LikeablePersonService 에서는 알림에 관한 건 신경쓸 필요X -> 이전보다 결합도가 낮아짐 
 
 
 **[특이사항]**
