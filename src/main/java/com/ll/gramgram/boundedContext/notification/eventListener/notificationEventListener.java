@@ -1,6 +1,7 @@
 package com.ll.gramgram.boundedContext.notification.eventListener;
 
 import com.ll.gramgram.base.event.EventAfterLike;
+import com.ll.gramgram.base.event.EventAfterModifyAttractiveType;
 import com.ll.gramgram.boundedContext.notification.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
@@ -16,6 +17,12 @@ public class notificationEventListener {
     @Transactional
     public void listen(EventAfterLike event) {
         notificationService.whenAfterLike(event.getLikeablePerson());
+    }
+
+    @EventListener
+    @Transactional
+    public void listen(EventAfterModifyAttractiveType event) {
+        notificationService.whenAfterModifyAttractiveType(event.getLikeablePerson(), event.getOldAttractiveTypeCode());
     }
 
 }

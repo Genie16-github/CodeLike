@@ -32,4 +32,18 @@ public class NotificationService {
 
         notificationRepository.save(notification);
     }
+
+    @Transactional
+    public void whenAfterModifyAttractiveType(LikeablePerson likeablePerson, int oldAttractiveTypeCode) {
+        Notification notification = Notification
+                .builder()
+                .fromInstaMember(likeablePerson.getFromInstaMember())
+                .toInstaMember(likeablePerson.getToInstaMember())
+                .newAttractiveTypeCode(likeablePerson.getAttractiveTypeCode())
+                .oldAttractiveTypeCode(oldAttractiveTypeCode)
+                .typeCode("Modify") // "Modify" -> 수정 알림
+                .build();
+
+        notificationRepository.save(notification);
+    }
 }
