@@ -383,7 +383,6 @@ public class LikeablePersonControllerTests {
         ResultActions resultActions = mvc
                 .perform(post("/usr/likeablePerson/modify/2")
                         .with(csrf()) // CSRF 키 생성
-                        .param("username", "abcd")
                         .param("attractiveTypeCode", "3")
                 )
                 .andDo(print());
@@ -393,5 +392,91 @@ public class LikeablePersonControllerTests {
                 .andExpect(handler().handlerType(LikeablePersonController.class))
                 .andExpect(handler().methodName("modify"))
                 .andExpect(status().is3xxRedirection());
+    }
+
+    @Test
+    @DisplayName("호감 표시를 하면 쿨타임이 설정되어 바로 수정 불가")
+    @WithUserDetails("user3")
+    void t016() throws Exception {
+        Member memberUser3 = memberService.findByUsername("user3").get();
+        likeablePersonService.like(memberUser3, "insta_user11", 1);
+
+        // WHEN
+        ResultActions resultActions = mvc
+                .perform(post("/usr/likeablePerson/modify/3")
+                        .with(csrf()) // CSRF 키 생성
+                        .param("attractiveTypeCode", "3")
+                )
+                .andDo(print());
+
+        // THEN
+        resultActions
+                .andExpect(handler().handlerType(LikeablePersonController.class))
+                .andExpect(handler().methodName("modify"))
+                .andExpect(status().is4xxClientError());
+    }
+
+    @Test
+    @DisplayName("호감 표시를 하면 쿨타임이 설정되어 바로 취소 불가")
+    @WithUserDetails("user3")
+    void t017() throws Exception {
+        Member memberUser3 = memberService.findByUsername("user3").get();
+        likeablePersonService.like(memberUser3, "insta_user11", 1);
+
+        // WHEN
+        ResultActions resultActions = mvc
+                .perform(delete("/usr/likeablePerson/3")
+                        .with(csrf()) // CSRF 키 생성
+                )
+                .andDo(print());
+
+        // THEN
+        resultActions
+                .andExpect(handler().handlerType(LikeablePersonController.class))
+                .andExpect(handler().methodName("cancel"))
+                .andExpect(status().is4xxClientError());
+    }
+
+    @Test
+    @DisplayName("호감사유 수정을 하면 쿨타임이 갱신되어 바로 수정 불가")
+    @WithUserDetails("user3")
+    void t018() throws Exception {
+        Member memberUser3 = memberService.findByUsername("user3").get();
+        likeablePersonService.modifyAttractive(memberUser3, 2L, 3);
+
+        // WHEN
+        ResultActions resultActions = mvc
+                .perform(post("/usr/likeablePerson/modify/2")
+                        .with(csrf()) // CSRF 키 생성
+                        .param("attractiveTypeCode", "1")
+                )
+                .andDo(print());
+
+        // THEN
+        resultActions
+                .andExpect(handler().handlerType(LikeablePersonController.class))
+                .andExpect(handler().methodName("modify"))
+                .andExpect(status().is4xxClientError());
+    }
+
+    @Test
+    @DisplayName("호감사유 수정을 하면 쿨타임이 갱신되어 바로 취소 불가")
+    @WithUserDetails("user3")
+    void t019() throws Exception {
+        Member memberUser3 = memberService.findByUsername("user3").get();
+        likeablePersonService.modifyAttractive(memberUser3, 2L, 3);
+
+        // WHEN
+        ResultActions resultActions = mvc
+                .perform(delete("/usr/likeablePerson/2")
+                        .with(csrf()) // CSRF 키 생성
+                )
+                .andDo(print());
+
+        // THEN
+        resultActions
+                .andExpect(handler().handlerType(LikeablePersonController.class))
+                .andExpect(handler().methodName("cancel"))
+                .andExpect(status().is4xxClientError());
     }
 }
