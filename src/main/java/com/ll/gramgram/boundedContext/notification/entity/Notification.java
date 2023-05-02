@@ -3,21 +3,25 @@ package com.ll.gramgram.boundedContext.notification.entity;
 import com.ll.gramgram.base.baseEntity.BaseEntity;
 import com.ll.gramgram.boundedContext.instaMember.entity.InstaMember;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.ManyToOne;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
+@ToString
 @Entity
 @Getter
-@NoArgsConstructor
-@SuperBuilder
-@ToString(callSuper = true)
 public class Notification extends BaseEntity {
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDateTime readDate;
     @ManyToOne
     @ToString.Exclude
@@ -49,5 +53,9 @@ public class Notification extends BaseEntity {
             return (diff / 60 / 60) + "시간";
         }
         else return (diff / 60/ 60/ 24) + "일";
+    }
+
+    public void setAfterReadNotification(LocalDateTime localDateTime) {
+        this.readDate = localDateTime;
     }
 }
