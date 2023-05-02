@@ -20,14 +20,14 @@ public class NotificationService {
     }
 
     @Transactional
-    public void likeNotification(LikeablePerson likeablePerson, String typeCode) {
+    public void whenAfterLike(LikeablePerson likeablePerson) {
         Notification notification = Notification
                 .builder()
                 .fromInstaMember(likeablePerson.getFromInstaMember()) // 호감을 표시하는 사람의 인스타 멤버
                 .toInstaMember(likeablePerson.getToInstaMember()) // 호감을 받는 사람의 인스타 멤버
                 // 호감사유(1=외모, 2=능력, 3=성격)
                 .newAttractiveTypeCode(likeablePerson.getAttractiveTypeCode())
-                .typeCode(typeCode) // "Like" -> 좋아요 알림
+                .typeCode("Like") // "Like" -> 좋아요 알림
                 .build();
 
         notificationRepository.save(notification);

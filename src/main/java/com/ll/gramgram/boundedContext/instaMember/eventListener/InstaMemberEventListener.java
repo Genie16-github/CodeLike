@@ -22,16 +22,19 @@ public class InstaMemberEventListener {
     }
 
     @EventListener
+    @Transactional
     public void listen(EventAfterLike event) {
         instaMemberService.whenAfterLike(event.getLikeablePerson());
     }
 
     @EventListener
+    @Transactional
     public void listen(EventBeforeCancelLike event) {
         instaMemberService.whenBeforeCancelLike(event.getLikeablePerson());
     }
 
     @EventListener
+    @Transactional
     public void listen(EventAfterFromInstaMemberChangeGender event) {
         instaMemberService.whenAfterFromInstaMemberChangeGender(event.getInstaMember(), event.getOldGender());
     }

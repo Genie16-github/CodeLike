@@ -1,5 +1,6 @@
 package com.ll.gramgram.boundedContext.instaMember.service;
 
+import com.ll.gramgram.base.event.EventAfterLike;
 import com.ll.gramgram.base.rsData.RsData;
 import com.ll.gramgram.boundedContext.instaMember.entity.InstaMember;
 import com.ll.gramgram.boundedContext.instaMember.entity.InstaMemberSnapshot;
@@ -10,6 +11,7 @@ import com.ll.gramgram.boundedContext.member.entity.Member;
 import com.ll.gramgram.boundedContext.member.service.MemberService;
 import com.ll.gramgram.boundedContext.notification.service.NotificationService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,7 +23,6 @@ import java.util.Optional;
 public class InstaMemberService {
     private final InstaMemberRepository instaMemberRepository;
     private final MemberService memberService;
-    private final NotificationService notificationService;
     private final InstaMemberSnapshotRepository instaMemberSnapshotRepository;
 
     public Optional<InstaMember> findByUsername(String username) {
@@ -115,8 +116,6 @@ public class InstaMemberService {
 
         saveSnapshot(snapshot);
 
-        // 좋아요(Like) 알림 등록
-        notificationService.likeNotification(likeablePerson, "Like");
     }
 
     public void whenBeforeCancelLike(LikeablePerson likeablePerson) {
