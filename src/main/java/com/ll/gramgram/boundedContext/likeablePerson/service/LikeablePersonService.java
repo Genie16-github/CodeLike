@@ -15,8 +15,6 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -28,7 +26,6 @@ public class LikeablePersonService {
     private final LikeablePersonRepository likeablePersonRepository;
     private final InstaMemberService instaMemberService;
     private final ApplicationEventPublisher publisher;
-    private final long changeableTime = AppConfig.getChangeableTime();
 
     @Transactional
     public RsData<LikeablePerson> like(Member actor, String username, int attractiveTypeCode) {
@@ -48,6 +45,8 @@ public class LikeablePersonService {
                 .toInstaMember(toInstaMember) // 호감을 받는 사람의 인스타 멤버
                 .toInstaMemberUsername(toInstaMember.getUsername()) // 중요하지 않음
                 .attractiveTypeCode(attractiveTypeCode) // 1=외모, 2=능력, 3=성격
+                // 호감 표시했을 때 수정/삭제 가능 시간 설정
+                .modifyUnlockDate(AppConfig.genLikeablePersonModifyUnlockDate())
                 .build();
 
         likeablePersonRepository.save(likeablePerson); // 저장
@@ -73,11 +72,6 @@ public class LikeablePersonService {
 
     @Transactional
     public RsData<LikeablePerson> cancel(LikeablePerson likeablePerson) {
-        long timeDiff = checkTimeDiff(likeablePerson.getModifyDate());
-        if (timeDiff < changeableTime) {
-            String changeableTimeStr = transTimeFormat(timeDiff);
-            return RsData.of("F-1", changeableTimeStr + "후에 취소가 가능합니다.");
-        }
 
         publisher.publishEvent(new EventBeforeCancelLike(this, likeablePerson));
 
@@ -93,7 +87,7 @@ public class LikeablePersonService {
         return RsData.of("S-1", "%s님에 대한 호감을 취소하였습니다.".formatted(likeCanceledUsername));
     }
 
-    public RsData<LikeablePerson> canActorDelete(Member actor, LikeablePerson likeablePerson) {
+    public RsData<LikeablePerson> canActorCancel(Member actor, LikeablePerson likeablePerson) {
         // 찾은 객체가 없다면 에러 메시지 출력
         if (likeablePerson == null) return RsData.of("F-1", "이미 취소되었습니다.");
 
@@ -105,6 +99,11 @@ public class LikeablePersonService {
         // 지금 현재 로그인한 사용자의 인스타 아이디와 likeablePerson 객체의 FromInstaMember 데이터가 일치하지 않을 경우
         if (actorInstaMemberId != fromInstaMemberId)
             return RsData.of("F-2", "권한이 없습니다.");
+
+        // 호감 취소 버튼을 누르지 않고 url 로 접근하는 것을 막음
+        if (!likeablePerson.isModifyUnlocked()) {
+            return RsData.of("F-3", "삭제 가능 시간이 아닙니다.");
+        }
 
         return RsData.of("S-1", "취소 가능합니다.");
     }
@@ -164,7 +163,8 @@ public class LikeablePersonService {
         return modifyAttractive(actor, likeablePerson, attractiveTypeCode);
     }
 
-    private RsData<LikeablePerson> modifyAttractive(Member actor, LikeablePerson likeablePerson, int attractiveTypeCode) {
+    @Transactional
+    public RsData<LikeablePerson> modifyAttractive(Member actor, LikeablePerson likeablePerson, int attractiveTypeCode) {
         RsData canModifyRsData = canModifyLike(actor, likeablePerson);
 
         if (canModifyRsData.isFail()) {
@@ -200,6 +200,7 @@ public class LikeablePersonService {
 
     private void modifyAttractionTypeCode(LikeablePerson likeablePerson, int attractiveTypeCode) {
         int oldAttractiveTypeCode = likeablePerson.getAttractiveTypeCode();
+        // attractionTypeCode를 갱신하면서 수정/삭제 가능 시간도 갱신
         RsData rsData = likeablePerson.updateAttractionTypeCode(attractiveTypeCode);
 
         if (rsData.isSuccess()) {
@@ -212,33 +213,17 @@ public class LikeablePersonService {
             return RsData.of("F-1", "먼저 본인의 인스타그램 아이디를 입력해주세요.");
         }
 
-        long timeDiff = checkTimeDiff(likeablePerson.getModifyDate());
-        if (timeDiff < changeableTime) {
-            String changeableTimeStr = transTimeFormat(timeDiff);
-            return RsData.of("F-3", changeableTimeStr + "후에 수정이 가능합니다.");
-        }
-
         InstaMember fromInstaMember = actor.getInstaMember();
 
         if (!Objects.equals(likeablePerson.getFromInstaMember().getId(), fromInstaMember.getId())) {
             return RsData.of("F-2", "해당 호감표시를 수정할 권한이 없습니다.");
         }
 
+        // 호감사유 변경 버튼을 누르지 않고 url 로 접근하는 것을 막음
+        if (!likeablePerson.isModifyUnlocked()) {
+            return RsData.of("F-3", "수정 가능 시간이 아닙니다.");
+        }
 
         return RsData.of("S-1", "호감표시 취소가 가능합니다.");
-    }
-
-    public long checkTimeDiff(LocalDateTime localDateTime) {
-        long diff = ChronoUnit.SECONDS.between(localDateTime, LocalDateTime.now());
-        return diff;
-    }
-
-    public String transTimeFormat(long time) {
-        time = changeableTime - time;
-        long hour = time / 3600; // 시
-        long minute = time % 3600 / 60; // 분
-        long second = time % 3600 % 60; // 초
-
-        return hour + "시 " + minute + "분 " + second + "초";
     }
 }

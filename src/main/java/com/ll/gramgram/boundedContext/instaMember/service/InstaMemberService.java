@@ -1,5 +1,6 @@
 package com.ll.gramgram.boundedContext.instaMember.service;
 
+import com.ll.gramgram.base.event.EventAfterLike;
 import com.ll.gramgram.base.rsData.RsData;
 import com.ll.gramgram.boundedContext.instaMember.entity.InstaMember;
 import com.ll.gramgram.boundedContext.instaMember.entity.InstaMemberSnapshot;
@@ -8,7 +9,9 @@ import com.ll.gramgram.boundedContext.instaMember.repository.InstaMemberSnapshot
 import com.ll.gramgram.boundedContext.likeablePerson.entity.LikeablePerson;
 import com.ll.gramgram.boundedContext.member.entity.Member;
 import com.ll.gramgram.boundedContext.member.service.MemberService;
+import com.ll.gramgram.boundedContext.notification.service.NotificationService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -113,7 +116,6 @@ public class InstaMemberService {
 
         saveSnapshot(snapshot);
 
-        // 알림
     }
 
     public void whenBeforeCancelLike(LikeablePerson likeablePerson) {
@@ -139,5 +141,42 @@ public class InstaMemberService {
 
                     saveSnapshot(snapshot);
                 });
+    }
+
+    public RsData<InstaMember> connect(Member actor, String gender, String oauthId, String username, String accessToken) {
+        Optional<InstaMember> opInstaMember = instaMemberRepository.findByOauthId(oauthId);
+
+        if (opInstaMember.isPresent()) {
+            InstaMember instaMember = opInstaMember.get();
+            instaMember.setUsername(username);
+            instaMember.setAccessToken(accessToken);
+            instaMember.setGender(gender);
+            instaMemberRepository.save(instaMember);
+
+            actor.setInstaMember(instaMember);
+
+            return RsData.of("S-3", "인스타계정이 연결되었습니다.", instaMember);
+        }
+
+        opInstaMember = findByUsername(username);
+
+        if (opInstaMember.isPresent()) {
+            InstaMember instaMember = opInstaMember.get();
+            instaMember.setOauthId(oauthId);
+            instaMember.setAccessToken(accessToken);
+            instaMember.setGender(gender);
+            instaMemberRepository.save(instaMember);
+
+            actor.setInstaMember(instaMember);
+
+            return RsData.of("S-4", "인스타계정이 연결되었습니다.", instaMember);
+        }
+
+        InstaMember instaMember = connect(actor, username, gender).getData();
+
+        instaMember.setOauthId(oauthId);
+        instaMember.setAccessToken(accessToken);
+
+        return RsData.of("S-5", "인스타계정이 연결되었습니다.", instaMember);
     }
 }

@@ -9,7 +9,9 @@ import com.ll.gramgram.boundedContext.likeablePerson.service.LikeablePersonServi
 import com.ll.gramgram.boundedContext.member.entity.Member;
 import com.ll.gramgram.boundedContext.member.service.MemberService;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -33,6 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @Transactional
 @ActiveProfiles("test")
+@TestMethodOrder(MethodOrderer.MethodName.class)
 public class LikeablePersonControllerTests {
     @Autowired
     private MockMvc mvc;
@@ -61,8 +64,7 @@ public class LikeablePersonControllerTests {
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(content().string(containsString("""
                         먼저 본인의 인스타 아이디를 입력해주세요.
-                        """.stripIndent().trim())))
-        ;
+                        """.stripIndent().trim())));
     }
 
     @Test
@@ -93,7 +95,6 @@ public class LikeablePersonControllerTests {
                 .andExpect(content().string(containsString("""
                         id="btn-like-1"
                         """.stripIndent().trim())));
-        ;
     }
 
     @Test
@@ -135,7 +136,6 @@ public class LikeablePersonControllerTests {
                 .andExpect(handler().handlerType(LikeablePersonController.class))
                 .andExpect(handler().methodName("like"))
                 .andExpect(status().is3xxRedirection());
-        ;
     }
 
     @Test
@@ -164,7 +164,6 @@ public class LikeablePersonControllerTests {
                 .andExpect(content().string(containsString("""
                         data-test="toInstaMember_attractiveTypeDisplayName=성격"
                         """.stripIndent().trim())));
-        ;
     }
 
     @Test
@@ -206,8 +205,7 @@ public class LikeablePersonControllerTests {
         resultActions
                 .andExpect(handler().handlerType(LikeablePersonController.class))
                 .andExpect(handler().methodName("cancel"))
-                .andExpect(status().is4xxClientError())
-        ;
+                .andExpect(status().is4xxClientError());
     }
 
     @Test
@@ -226,8 +224,7 @@ public class LikeablePersonControllerTests {
         resultActions
                 .andExpect(handler().handlerType(LikeablePersonController.class))
                 .andExpect(handler().methodName("cancel"))
-                .andExpect(status().is4xxClientError())
-        ;
+                .andExpect(status().is4xxClientError());
 
         assertThat(likeablePersonService.findById(1L).isPresent()).isEqualTo(true);
     }
@@ -250,7 +247,6 @@ public class LikeablePersonControllerTests {
                 .andExpect(handler().handlerType(LikeablePersonController.class))
                 .andExpect(handler().methodName("like"))
                 .andExpect(status().is4xxClientError());
-        ;
     }
 
     @Test
@@ -271,7 +267,6 @@ public class LikeablePersonControllerTests {
                 .andExpect(handler().handlerType(LikeablePersonController.class))
                 .andExpect(handler().methodName("like"))
                 .andExpect(status().is4xxClientError());
-        ;
     }
 
     @Test
@@ -291,8 +286,7 @@ public class LikeablePersonControllerTests {
         resultActions
                 .andExpect(handler().handlerType(LikeablePersonController.class))
                 .andExpect(handler().methodName("like"))
-                .andExpect(status().is4xxClientError()) // rq.historyBack
-        ;
+                .andExpect(status().is4xxClientError()); // rq.historyBack
 
         // insta_user4가 `좋아요`를 받은 데이터를 검색
         // 중복 입력이 불가하기 때문에 리스트의 크기는 1이 돼야한다.
@@ -325,7 +319,6 @@ public class LikeablePersonControllerTests {
                 .andExpect(handler().handlerType(LikeablePersonController.class))
                 .andExpect(handler().methodName("like"))
                 .andExpect(status().is4xxClientError());
-        ;
     }
 
     @Test
@@ -345,8 +338,7 @@ public class LikeablePersonControllerTests {
         resultActions
                 .andExpect(handler().handlerType(LikeablePersonController.class))
                 .andExpect(handler().methodName("like"))
-                .andExpect(status().is3xxRedirection())
-        ;
+                .andExpect(status().is3xxRedirection());
 
         LikeablePerson likeablePerson = likeablePersonRepository.findByFromInstaMemberIdAndToInstaMember_username(2L, "insta_user4");
         assertThat(likeablePerson.getAttractiveTypeCode()).isEqualTo(2);
@@ -381,7 +373,6 @@ public class LikeablePersonControllerTests {
                 .andExpect(content().string(containsString("""
                         id="btn-modify-like-1"
                         """.stripIndent().trim())));
-        ;
     }
 
     @Test
@@ -392,7 +383,6 @@ public class LikeablePersonControllerTests {
         ResultActions resultActions = mvc
                 .perform(post("/usr/likeablePerson/modify/2")
                         .with(csrf()) // CSRF 키 생성
-                        .param("username", "abcd")
                         .param("attractiveTypeCode", "3")
                 )
                 .andDo(print());
@@ -402,6 +392,91 @@ public class LikeablePersonControllerTests {
                 .andExpect(handler().handlerType(LikeablePersonController.class))
                 .andExpect(handler().methodName("modify"))
                 .andExpect(status().is3xxRedirection());
-        ;
+    }
+
+    @Test
+    @DisplayName("호감 표시를 하면 쿨타임이 설정되어 바로 수정 불가")
+    @WithUserDetails("user3")
+    void t016() throws Exception {
+        Member memberUser3 = memberService.findByUsername("user3").get();
+        likeablePersonService.like(memberUser3, "insta_user11", 1);
+
+        // WHEN
+        ResultActions resultActions = mvc
+                .perform(post("/usr/likeablePerson/modify/3")
+                        .with(csrf()) // CSRF 키 생성
+                        .param("attractiveTypeCode", "3")
+                )
+                .andDo(print());
+
+        // THEN
+        resultActions
+                .andExpect(handler().handlerType(LikeablePersonController.class))
+                .andExpect(handler().methodName("modify"))
+                .andExpect(status().is4xxClientError());
+    }
+
+    @Test
+    @DisplayName("호감 표시를 하면 쿨타임이 설정되어 바로 취소 불가")
+    @WithUserDetails("user3")
+    void t017() throws Exception {
+        Member memberUser3 = memberService.findByUsername("user3").get();
+        likeablePersonService.like(memberUser3, "insta_user11", 1);
+
+        // WHEN
+        ResultActions resultActions = mvc
+                .perform(delete("/usr/likeablePerson/3")
+                        .with(csrf()) // CSRF 키 생성
+                )
+                .andDo(print());
+
+        // THEN
+        resultActions
+                .andExpect(handler().handlerType(LikeablePersonController.class))
+                .andExpect(handler().methodName("cancel"))
+                .andExpect(status().is4xxClientError());
+    }
+
+    @Test
+    @DisplayName("호감사유 수정을 하면 쿨타임이 갱신되어 바로 수정 불가")
+    @WithUserDetails("user3")
+    void t018() throws Exception {
+        Member memberUser3 = memberService.findByUsername("user3").get();
+        likeablePersonService.modifyAttractive(memberUser3, 2L, 3);
+
+        // WHEN
+        ResultActions resultActions = mvc
+                .perform(post("/usr/likeablePerson/modify/2")
+                        .with(csrf()) // CSRF 키 생성
+                        .param("attractiveTypeCode", "1")
+                )
+                .andDo(print());
+
+        // THEN
+        resultActions
+                .andExpect(handler().handlerType(LikeablePersonController.class))
+                .andExpect(handler().methodName("modify"))
+                .andExpect(status().is4xxClientError());
+    }
+
+    @Test
+    @DisplayName("호감사유 수정을 하면 쿨타임이 갱신되어 바로 취소 불가")
+    @WithUserDetails("user3")
+    void t019() throws Exception {
+        Member memberUser3 = memberService.findByUsername("user3").get();
+        likeablePersonService.modifyAttractive(memberUser3, 2L, 3);
+
+        // WHEN
+        ResultActions resultActions = mvc
+                .perform(delete("/usr/likeablePerson/2")
+                        .with(csrf()) // CSRF 키 생성
+                )
+                .andDo(print());
+
+        // THEN
+        resultActions
+                .andExpect(handler().handlerType(LikeablePersonController.class))
+                .andExpect(handler().methodName("cancel"))
+                .andExpect(status().is4xxClientError());
     }
 }

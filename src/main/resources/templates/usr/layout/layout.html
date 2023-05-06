@@ -31,16 +31,16 @@
                         호감목록</a>
                     </li>
                     <li th:if="${@rq.login}" th:unless="${@rq.member.hasConnectedInstaMember}">
-                        <a href="/usr/instaMember/connect">
+                        <a href="/usr/instaMember/connectByApi">
                             <i class="fa-brands fa-instagram"></i>
-                            인스타 아이디 입력
+                            인스타 아이디 연결
                         </a>
                     </li>
                     <div th:if="${@rq.login}" class="divider"></div>
                     <li><a href="/usr/home/about"><i class="fa-solid fa-circle-info"></i> 그램그램이란?</a>
                     </li>
                     <li th:if="${@rq.login}">
-                        <a href="javascript:;" onclick="$(this).next().submit();">
+                        <a href="javascript:" onclick="$(this).next().submit();">
                             <i class="fa-solid fa-arrow-right-from-bracket"></i> 로그아웃
                         </a>
                         <form class="!hidden" hidden th:action="|/usr/member/logout|" method="POST"></form>
