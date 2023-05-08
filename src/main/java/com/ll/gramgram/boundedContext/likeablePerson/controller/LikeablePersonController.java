@@ -127,7 +127,6 @@ public class LikeablePersonController {
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/toList")
-    @ResponseBody
     public String showToList(Model model) {
         InstaMember instaMember = rq.getMember().getInstaMember();
 
