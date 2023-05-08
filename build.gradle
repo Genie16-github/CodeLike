@@ -32,6 +32,8 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
 
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+
     runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
     runtimeOnly 'com.mysql:mysql-connector-j'
     runtimeOnly 'com.h2database:h2'
