@@ -98,14 +98,14 @@ public class LikeablePersonService {
 
         // 지금 현재 로그인한 사용자의 인스타 아이디와 likeablePerson 객체의 FromInstaMember 데이터가 일치하지 않을 경우
         if (actorInstaMemberId != fromInstaMemberId)
-            return RsData.of("F-2", "권한이 없습니다.");
+            return RsData.of("F-2", "호감표시 취소 권한이 없습니다.");
 
         // 호감 취소 버튼을 누르지 않고 url 로 접근하는 것을 막음
         if (!likeablePerson.isModifyUnlocked()) {
-            return RsData.of("F-3", "삭제 가능 시간이 아닙니다.");
+            return RsData.of("F-3", "호감표시 취소 가능 시간이 아닙니다.");
         }
 
-        return RsData.of("S-1", "취소 가능합니다.");
+        return RsData.of("S-1", "호감표시 취소가 가능합니다.");
     }
 
     private RsData canLike(Member actor, String username, int attractiveTypeCode) {
@@ -165,7 +165,7 @@ public class LikeablePersonService {
 
     @Transactional
     public RsData<LikeablePerson> modifyAttractive(Member actor, LikeablePerson likeablePerson, int attractiveTypeCode) {
-        RsData canModifyRsData = canModifyLike(actor, likeablePerson);
+        RsData canModifyRsData = canModify(actor, likeablePerson);
 
         if (canModifyRsData.isFail()) {
             return canModifyRsData;
@@ -208,7 +208,7 @@ public class LikeablePersonService {
         }
     }
 
-    public RsData canModifyLike(Member actor, LikeablePerson likeablePerson) {
+    public RsData canModify(Member actor, LikeablePerson likeablePerson) {
         if (!actor.hasConnectedInstaMember()) {
             return RsData.of("F-1", "먼저 본인의 인스타그램 아이디를 입력해주세요.");
         }
@@ -216,14 +216,14 @@ public class LikeablePersonService {
         InstaMember fromInstaMember = actor.getInstaMember();
 
         if (!Objects.equals(likeablePerson.getFromInstaMember().getId(), fromInstaMember.getId())) {
-            return RsData.of("F-2", "해당 호감표시를 수정할 권한이 없습니다.");
+            return RsData.of("F-2", "해당 호감표시 사유를 수정할 권한이 없습니다.");
         }
 
         // 호감사유 변경 버튼을 누르지 않고 url 로 접근하는 것을 막음
         if (!likeablePerson.isModifyUnlocked()) {
-            return RsData.of("F-3", "수정 가능 시간이 아닙니다.");
+            return RsData.of("F-3", "호감표시 사유 수정 가능 시간이 아닙니다.");
         }
 
-        return RsData.of("S-1", "호감표시 취소가 가능합니다.");
+        return RsData.of("S-1", "호감표시 사유 수정이 가능합니다.");
     }
 }

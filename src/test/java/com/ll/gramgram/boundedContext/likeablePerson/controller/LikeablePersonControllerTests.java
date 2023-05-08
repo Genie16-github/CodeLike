@@ -115,7 +115,6 @@ public class LikeablePersonControllerTests {
                 .andExpect(handler().handlerType(LikeablePersonController.class))
                 .andExpect(handler().methodName("like"))
                 .andExpect(status().is3xxRedirection());
-        ;
     }
 
     @Test
@@ -392,6 +391,7 @@ public class LikeablePersonControllerTests {
                 .andExpect(handler().handlerType(LikeablePersonController.class))
                 .andExpect(handler().methodName("modify"))
                 .andExpect(status().is3xxRedirection());
+
     }
 
     @Test
@@ -414,6 +414,8 @@ public class LikeablePersonControllerTests {
                 .andExpect(handler().handlerType(LikeablePersonController.class))
                 .andExpect(handler().methodName("modify"))
                 .andExpect(status().is4xxClientError());
+
+        assertThat(likeablePersonService.findById(3L).get().getAttractiveTypeCode()).isEqualTo(1);
     }
 
     @Test
@@ -435,6 +437,8 @@ public class LikeablePersonControllerTests {
                 .andExpect(handler().handlerType(LikeablePersonController.class))
                 .andExpect(handler().methodName("cancel"))
                 .andExpect(status().is4xxClientError());
+
+        assertThat(likeablePersonService.findById(3L).isPresent()).isEqualTo(true);
     }
 
     @Test
@@ -457,6 +461,8 @@ public class LikeablePersonControllerTests {
                 .andExpect(handler().handlerType(LikeablePersonController.class))
                 .andExpect(handler().methodName("modify"))
                 .andExpect(status().is4xxClientError());
+
+        assertThat(likeablePersonService.findById(2L).get().getAttractiveTypeCode()).isEqualTo(3);
     }
 
     @Test
@@ -478,5 +484,7 @@ public class LikeablePersonControllerTests {
                 .andExpect(handler().handlerType(LikeablePersonController.class))
                 .andExpect(handler().methodName("cancel"))
                 .andExpect(status().is4xxClientError());
+
+        assertThat(likeablePersonService.findById(2L).isPresent()).isEqualTo(true);
     }
 }
