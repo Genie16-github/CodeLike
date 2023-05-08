@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -120,5 +121,39 @@ public class NotificationControllerTests {
                 .andExpect(content().string(containsString("""
                         </span> 으로 변경했습니다.
                         """.stripIndent().trim())));
+    }
+
+    @Test
+    @DisplayName("아직 읽지 않은 알림이 있을 때 상단바에 인디케이터 표시")
+    @WithUserDetails("user4")
+    void t004() throws Exception {
+        // WHEN
+        ResultActions resultActions = mvc
+                .perform(get("/usr/home/about"))
+                .andDo(print());
+
+        // THEN
+        resultActions
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(content().string(containsString("""
+                        data-test="hasUnreadNotifications"
+                        """.stripIndent().trim())));
+    }
+
+    @Test
+    @DisplayName("아직 읽지 않은 알림이 있을 때, 알림리스트에 접속하면 상단바에 인디케이터 표시가 더 이상 안됨")
+    @WithUserDetails("user4")
+    void t005() throws Exception {
+        // WHEN
+        ResultActions resultActions = mvc
+                .perform(get("/usr/notification/list"))
+                .andDo(print());
+
+        // THEN
+        resultActions
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(content().string(not(containsString("""
+                        data-test="hasUnreadNotifications"
+                        """.stripIndent().trim()))));
     }
 }

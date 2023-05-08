@@ -61,4 +61,8 @@ public class NotificationService {
             }
         }
     }
+
+    public boolean countUnreadNotificationsByToInstaMember(InstaMember instaMember) {
+        return notificationRepository.countByToInstaMemberAndReadDateIsNull(instaMember) > 0;
+    }
 }
