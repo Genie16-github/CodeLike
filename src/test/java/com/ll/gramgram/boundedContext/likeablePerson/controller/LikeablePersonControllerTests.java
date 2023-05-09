@@ -396,10 +396,9 @@ public class LikeablePersonControllerTests {
 
     @Test
     @DisplayName("호감 표시를 하면 쿨타임이 설정되어 바로 수정 불가")
-    @WithUserDetails("user3")
     void t016() throws Exception {
-        Member memberUser3 = memberService.findByUsername("user3").get();
-        likeablePersonService.like(memberUser3, "insta_user11", 1);
+        Member memberUser2 = memberService.findByUsername("user2").get();
+        likeablePersonService.like(memberUser2, "insta_user3", 1);
 
         // WHEN
         ResultActions resultActions = mvc
@@ -423,7 +422,7 @@ public class LikeablePersonControllerTests {
     @WithUserDetails("user3")
     void t017() throws Exception {
         Member memberUser3 = memberService.findByUsername("user3").get();
-        likeablePersonService.like(memberUser3, "insta_user11", 1);
+        likeablePersonService.like(memberUser3, "insta_user2", 1);
 
         // WHEN
         ResultActions resultActions = mvc

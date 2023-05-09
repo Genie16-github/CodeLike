@@ -180,9 +180,12 @@ public class LikeablePersonController {
                 case 5:
                     // 성별에 따른 정렬(여성에게 받은 호감표시를 먼저), 2순위 정렬 조건은 최신순
                     likeablePeopleStream = likeablePeopleStream.sorted(
-                            (li2, li1) -> li2.getFromInstaMember().getGender().compareTo(li1.getFromInstaMember().getGender()) * -1
-                    ).sorted(
-                            (lp2, lp1) -> lp1.getCreateDate().compareTo(lp2.getCreateDate())
+                            (lp2, lp1) -> {
+                                if (lp2.getFromInstaMember().getGender().equals(lp1.getFromInstaMember().getGender())){
+                                    return lp1.getCreateDate().compareTo(lp2.getCreateDate());
+                                }
+                                return lp1.getFromInstaMember().getGender().compareTo(lp2.getFromInstaMember().getGender());
+                            }
                     );
                     break;
                 case 6:
