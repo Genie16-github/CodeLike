@@ -398,9 +398,6 @@ public class LikeablePersonControllerTests {
     @DisplayName("호감 표시를 하면 쿨타임이 설정되어 바로 수정 불가")
     @WithUserDetails("user3")
     void t016() throws Exception {
-        Member memberUser3 = memberService.findByUsername("user3").get();
-        likeablePersonService.like(memberUser3, "insta_user11", 1);
-
         // WHEN
         ResultActions resultActions = mvc
                 .perform(post("/usr/likeablePerson/modify/3")
@@ -415,16 +412,13 @@ public class LikeablePersonControllerTests {
                 .andExpect(handler().methodName("modify"))
                 .andExpect(status().is4xxClientError());
 
-        assertThat(likeablePersonService.findById(3L).get().getAttractiveTypeCode()).isEqualTo(1);
+        assertThat(likeablePersonService.findById(3L).get().getAttractiveTypeCode()).isEqualTo(2);
     }
 
     @Test
     @DisplayName("호감 표시를 하면 쿨타임이 설정되어 바로 취소 불가")
     @WithUserDetails("user3")
     void t017() throws Exception {
-        Member memberUser3 = memberService.findByUsername("user3").get();
-        likeablePersonService.like(memberUser3, "insta_user11", 1);
-
         // WHEN
         ResultActions resultActions = mvc
                 .perform(delete("/usr/likeablePerson/3")
