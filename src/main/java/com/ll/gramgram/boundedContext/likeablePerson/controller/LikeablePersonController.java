@@ -10,6 +10,7 @@ import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -128,77 +129,22 @@ public class LikeablePersonController {
         return rq.redirectWithMsg("/usr/likeablePerson/list", rsData);
     }
 
+    @Setter
+    public static class ToListForm {
+        private String gender = "";
+        private int attractiveTypeCode = 0;
+        private int sortCode = 1;
+    }
+
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/toList")
-    public String showToList(Model model, String gender,
-                             @RequestParam(defaultValue = "0") int attractiveTypeCode,
-                             @RequestParam(defaultValue = "1") int sortCode) {
+    public String showToList(Model model, ToListForm toListForm) {
         InstaMember instaMember = rq.getMember().getInstaMember();
 
         // 인스타인증을 했는지 체크
         if (instaMember != null) {
             // 해당 인스타회원이 좋아하는 사람들 목록
-            Stream<LikeablePerson> likeablePeopleStream = instaMember.getToLikeablePeople().stream();
-
-            if (gender != null && !gender.equals("")) { // 성별에 따라 필터링
-                likeablePeopleStream = likeablePeopleStream.filter(
-                        e -> Objects.equals(e.getFromInstaMember().getGender(), gender
-                ));
-            }
-
-            if (attractiveTypeCode != 0) { // 호감사유에 따라 필터링
-                likeablePeopleStream = likeablePeopleStream.filter(
-                        e -> e.getAttractiveTypeCode() == attractiveTypeCode
-                );
-            }
-
-            switch (sortCode) {
-                case 1:
-                    // 최신 순 정렬
-                    likeablePeopleStream = likeablePeopleStream.sorted(
-                            (lp2, lp1) -> lp1.getCreateDate().compareTo(lp2.getCreateDate())
-                    );
-                    break;
-                case 2:
-                    // 날짜 순 정렬(오래 전에 받은 호감표시를 우선적으로 표시)
-                    likeablePeopleStream = likeablePeopleStream.sorted(
-                            (lp2, lp1) -> lp1.getCreateDate().compareTo(lp2.getCreateDate()) * -1
-                    );
-                    break;
-                case 3:
-                    // 인기 많은 순 정렬(인기가 많은 사람의 호감표시를 우선적으로 표시)
-                    likeablePeopleStream = likeablePeopleStream.sorted(
-                            (lp2, lp1) -> lp1.getFromInstaMember().getToLikeablePeople().size() - lp2.getFromInstaMember().getToLikeablePeople().size()
-                    );
-                    break;
-                case 4:
-                    // 인기 적은 순 정렬
-                    likeablePeopleStream = likeablePeopleStream.sorted(
-                            (lp2, lp1) -> (lp1.getFromInstaMember().getToLikeablePeople().size() - lp2.getFromInstaMember().getToLikeablePeople().size()) * -1
-                    );
-                    break;
-                case 5:
-                    // 성별에 따른 정렬(여성에게 받은 호감표시를 먼저), 2순위 정렬 조건은 최신순
-                    likeablePeopleStream = likeablePeopleStream.sorted(
-                            (lp2, lp1) -> {
-                                if (lp2.getFromInstaMember().getGender().equals(lp1.getFromInstaMember().getGender())){
-                                    return lp1.getCreateDate().compareTo(lp2.getCreateDate());
-                                }
-                                return lp1.getFromInstaMember().getGender().compareTo(lp2.getFromInstaMember().getGender());
-                            }
-                    );
-                    break;
-                case 6:
-                    // 호감사유에 따른 정렬(외모, 성격, 능력 순), 2순위 정렬 조건은 최신순
-                    likeablePeopleStream = likeablePeopleStream.sorted(
-                            Comparator.comparing(LikeablePerson::getAttractiveTypeCode)
-                                    .thenComparing((lp2, lp1) -> lp1.getCreateDate().compareTo(lp2.getCreateDate()))
-                    );
-                    break;
-            }
-
-            List<LikeablePerson> likeablePeople = likeablePeopleStream.collect(Collectors.toList());
-
+            List<LikeablePerson> likeablePeople = likeablePersonService.findByToInstaMember(instaMember, toListForm.gender, toListForm.attractiveTypeCode, toListForm.sortCode);
             model.addAttribute("likeablePeople", likeablePeople);
         }
 

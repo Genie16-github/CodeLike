@@ -3,6 +3,7 @@ package com.ll.gramgram.boundedContext.likeablePerson.controller;
 
 import com.ll.gramgram.base.appConfig.AppConfig;
 import com.ll.gramgram.base.rq.Rq;
+import com.ll.gramgram.boundedContext.instaMember.entity.InstaMember;
 import com.ll.gramgram.boundedContext.likeablePerson.entity.LikeablePerson;
 import com.ll.gramgram.boundedContext.likeablePerson.repository.LikeablePersonRepository;
 import com.ll.gramgram.boundedContext.likeablePerson.service.LikeablePersonService;
@@ -18,10 +19,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -288,9 +293,9 @@ public class LikeablePersonControllerTests {
                 .andExpect(status().is4xxClientError()); // rq.historyBack
 
         // insta_user4가 `좋아요`를 받은 데이터를 검색
-        // 중복 입력이 불가하기 때문에 리스트의 크기는 1이 돼야한다.
+        // 중복 입력이 불가하기 때문에 리스트의 크기는 7이 돼야한다.
         List<LikeablePerson> likeablePeople = likeablePersonRepository.findByToInstaMember_username("insta_user4");
-        assertThat(likeablePeople.size()).isEqualTo(1);
+        assertThat(likeablePeople.size()).isEqualTo(7);
     }
 
     @Test
@@ -480,5 +485,91 @@ public class LikeablePersonControllerTests {
                 .andExpect(status().is4xxClientError());
 
         assertThat(likeablePersonService.findById(2L).isPresent()).isEqualTo(true);
+    }
+
+    @Test
+    @DisplayName("남성 필터링")
+    @WithUserDetails("user4")
+    void t020() throws Exception {
+        // WHEN
+        ResultActions resultActions = mvc
+                .perform(get("/usr/likeablePerson/toList?gender=M"))
+                .andDo(print());
+
+        // THEN
+        MvcResult mvcResult = resultActions
+                .andExpect(handler().handlerType(LikeablePersonController.class))
+                .andExpect(handler().methodName("showToList"))
+                .andExpect(status().is2xxSuccessful())
+                .andReturn();
+
+        Map<String, Object> model = mvcResult.getModelAndView().getModel();
+
+        List<LikeablePerson> likeablePeople = (List<LikeablePerson>) model.get("likeablePeople");
+
+        Map<String, Long> countings = likeablePeople
+                .stream()
+                .map(LikeablePerson::getFromInstaMember)
+                .map(InstaMember::getGender)
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+
+        assertThat(countings.get("M")).isEqualTo(likeablePeople.size());
+    }
+
+    @Test
+    @DisplayName("여성 필터링")
+    @WithUserDetails("user4")
+    void t021() throws Exception {
+        // WHEN
+        ResultActions resultActions = mvc
+                .perform(get("/usr/likeablePerson/toList?gender=W"))
+                .andDo(print());
+
+        // THEN
+        MvcResult mvcResult = resultActions
+                .andExpect(handler().handlerType(LikeablePersonController.class))
+                .andExpect(handler().methodName("showToList"))
+                .andExpect(status().is2xxSuccessful())
+                .andReturn();
+
+        Map<String, Object> model = mvcResult.getModelAndView().getModel();
+
+        List<LikeablePerson> likeablePeople = (List<LikeablePerson>) model.get("likeablePeople");
+
+        Map<String, Long> countings = likeablePeople
+                .stream()
+                .map(LikeablePerson::getFromInstaMember)
+                .map(InstaMember::getGender)
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+
+        assertThat(countings.get("W")).isEqualTo(likeablePeople.size());
+    }
+
+    @Test
+    @DisplayName("외모 필터링")
+    @WithUserDetails("user4")
+    void t022() throws Exception {
+        // WHEN
+        ResultActions resultActions = mvc
+                .perform(get("/usr/likeablePerson/toList?attractiveTypeCode=1"))
+                .andDo(print());
+
+        // THEN
+        MvcResult mvcResult = resultActions
+                .andExpect(handler().handlerType(LikeablePersonController.class))
+                .andExpect(handler().methodName("showToList"))
+                .andExpect(status().is2xxSuccessful())
+                .andReturn();
+
+        Map<String, Object> model = mvcResult.getModelAndView().getModel();
+
+        List<LikeablePerson> likeablePeople = (List<LikeablePerson>) model.get("likeablePeople");
+
+        Map<Integer, Long> countings = likeablePeople
+                .stream()
+                .map(LikeablePerson::getAttractiveTypeCode)
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+
+        assertThat(countings.get(1)).isEqualTo(likeablePeople.size());
     }
 }
