@@ -230,6 +230,10 @@ public class LikeablePersonService {
         return RsData.of("S-1", "호감표시 사유 수정이 가능합니다.");
     }
 
+    public List<LikeablePerson> findByToInstaMember(String username, String gender, int attractiveTypeCode, int sortCode) {
+        return findByToInstaMember(instaMemberService.findByUsername(username).get(), gender, attractiveTypeCode, sortCode);
+    }
+
     public List<LikeablePerson> findByToInstaMember(InstaMember instaMember, String gender, int attractiveTypeCode, int sortCode) {
         Stream<LikeablePerson> likeablePeopleStream = instaMember.getToLikeablePeople().stream();
 
