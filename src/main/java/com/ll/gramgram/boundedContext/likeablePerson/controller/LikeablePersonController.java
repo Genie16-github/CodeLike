@@ -129,13 +129,6 @@ public class LikeablePersonController {
         return rq.redirectWithMsg("/usr/likeablePerson/list", rsData);
     }
 
-    @Setter
-    public static class ToListForm {
-        private String gender = "";
-        private int attractiveTypeCode = 0;
-        private int sortCode = 1;
-    }
-
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/toList")
     public String showToList(Model model, ToListForm toListForm) {
@@ -149,5 +142,12 @@ public class LikeablePersonController {
         }
 
         return "usr/likeablePerson/toList";
+    }
+
+    @Setter
+    public static class ToListForm {
+        private String gender = "";
+        private int attractiveTypeCode = 0;
+        private int sortCode = 1;
     }
 }
