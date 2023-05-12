@@ -219,7 +219,7 @@ public class LikeablePersonServiceTests {
     @Test
     @DisplayName("정렬 - 최신순")
     void t009() {
-        List<LikeablePerson> likeablePeople = likeablePersonService.findByToInstaMember("insta_user4", "", 0, 1);
+        List<LikeablePerson> likeablePeople = likeablePersonService.findByToInstaMemberAndGenderAndAttractiveTypeCode("insta_user4", "", 0, 1);
 
         assertThat(likeablePeople)
                 .isSortedAccordingTo(Comparator.comparing(LikeablePerson::getId, Comparator.reverseOrder()));
@@ -229,7 +229,7 @@ public class LikeablePersonServiceTests {
     @DisplayName("정렬 - 날짜순")
     @Rollback(false)
     void t010() {
-        List<LikeablePerson> likeablePeople = likeablePersonService.findByToInstaMember("insta_user4", "", 0, 2);
+        List<LikeablePerson> likeablePeople = likeablePersonService.findByToInstaMemberAndGenderAndAttractiveTypeCode("insta_user4", "", 0, 2);
 
         assertThat(likeablePeople)
                 .isSortedAccordingTo(Comparator.comparing(LikeablePerson::getId));
@@ -239,7 +239,7 @@ public class LikeablePersonServiceTests {
     @DisplayName("정렬 - 인기 많은 순")
     @Rollback(false)
     void t011() {
-        List<LikeablePerson> likeablePeople = likeablePersonService.findByToInstaMember("insta_user4", "", 0, 3);
+        List<LikeablePerson> likeablePeople = likeablePersonService.findByToInstaMemberAndGenderAndAttractiveTypeCode("insta_user4", "", 0, 3);
 
         assertThat(likeablePeople)
                 .isSortedAccordingTo(
@@ -252,7 +252,7 @@ public class LikeablePersonServiceTests {
     @DisplayName("정렬 - 인기 적은 순")
     @Rollback(false)
     void t012() {
-        List<LikeablePerson> likeablePeople = likeablePersonService.findByToInstaMember("insta_user4", "", 0, 4);
+        List<LikeablePerson> likeablePeople = likeablePersonService.findByToInstaMemberAndGenderAndAttractiveTypeCode("insta_user4", "", 0, 4);
 
         assertThat(likeablePeople)
                 .isSortedAccordingTo(
@@ -265,7 +265,7 @@ public class LikeablePersonServiceTests {
     @DisplayName("정렬 - 성별순")
     @Rollback(false)
     void t013() {
-        List<LikeablePerson> likeablePeople = likeablePersonService.findByToInstaMember("insta_user4", "", 0, 5);
+        List<LikeablePerson> likeablePeople = likeablePersonService.findByToInstaMemberAndGenderAndAttractiveTypeCode("insta_user4", "", 0, 5);
 
         assertThat(likeablePeople)
                 .isSortedAccordingTo(
@@ -278,7 +278,7 @@ public class LikeablePersonServiceTests {
     @DisplayName("정렬 - 호감사유순")
     @Rollback(false)
     void t014() {
-        List<LikeablePerson> likeablePeople = likeablePersonService.findByToInstaMember("insta_user4", "", 0, 6);
+        List<LikeablePerson> likeablePeople = likeablePersonService.findByToInstaMemberAndGenderAndAttractiveTypeCode("insta_user4", "", 0, 6);
 
         assertThat(likeablePeople)
                 .isSortedAccordingTo(
